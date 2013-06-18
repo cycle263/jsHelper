@@ -1,0 +1,2424 @@
+/* ######################  function output object遍历对象内容  ###################### */
+var print = function(obj){
+  var str = "";
+	for(var item in obj){
+		if(typeof obj[item] != "object"){
+			str += item + ": " + obj[item] + "; <br />";
+		}else{
+			str += item + ": { <br />" + arguments.callee(obj[item]) + "}";
+		}
+	}
+	return str;
+}
+
+/* ######################  string与DOM tree之间的相互转换  ###################### */
+var convertDOM = {
+	object: undefined,
+	init: function(){
+		this.object = document.createElement('div');
+	},
+	DOMToString: function(DOM){
+		this.object.innerHTML = '';
+		this.object.appendChild(DOM.cloneNode(true));
+		return this.object.innerHTML;
+	},
+	StringToDOM: function(str){
+		this.object.innerHTML = str;
+		var container = document.createDocumentFragment();
+		var children = this.object.childNodes;
+		for(var i = 0, len = children.length; i < len; i++){
+			container.appendChild(children[i].cloneNode(true));
+		}
+		return container;
+	}
+};
+convertDOM.init();
+
+/* ######################  Nodelist、HTMLCollection转换成数组  ###################### */
+var convertArray = function(list){
+	return Array.prototype.slice.call(list);
+};
+
+/* ######################  重写Array原生对象prototype方法remove  ###################### */
+Array.prototype.remove = function(from, to){
+	var temps = this.slice(parseInt(to || from) + 1 || this.length);  //截取删除后的后半部分
+	this.length = from > 0 ? this.length + from : from;  //数组只保留删除后的前半部分
+	return this.push.apply(this, temps);  //将后半部分推入数组
+}
+
+/* ######################  兼容IE5写原生方法push和shift  ###################### */
+function Array_push() {
+	var A_p = 0;
+	for (A_p = 0; A_p < arguments.length; A_p++) {
+		this[this.length] = arguments[A_p];
+	}
+	return this.length;
+}
+
+if (typeof Array.prototype.push == "undefined") {
+	Array.prototype.push = Array_push;
+}
+
+function Array_shift() {
+	var A_s = 0;
+	var response = this[0];
+	for (A_s = 0; A_s < this.length-1; A_s++) {
+		this[A_s] = this[A_s + 1];
+	}
+	this.length--;
+	return response;
+}
+
+if (typeof Array.prototype.shift == "undefined") {
+	Array.prototype.shift = Array_shift;
+}
+
+
+////////////////////////  Cookies  /////////////////////////
+var CookieUtil = {
+	get: function(name){
+		var cookieName = encodeURIComponent(name) + "=",
+			cookieStart = document.cookie.indexOf(cookieName),
+			cookieValue = null;
+		if(cookieValue > -1){
+			var cookieEnd = document.cookie.indexOf(";", cookieStart);
+			if(cookieEnd == -1){
+				cookieEnd = document.cookie.length;				
+			}
+			cookieValue = decodeURIComponent(document.cookie.substring(cookieStart +
+						cookieName.length, cookieEnd));
+		}
+		return cookieValue;
+	},
+	set: function(name, value, expires, path, domain, secure){
+		var cookieText = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+		
+		(expires instanceof Date) && (cookieText += "; expires=" + expires.toGMTString());
+		path && (cookieText += "; path=" + path);
+		domain && (cookieText += "; domain=" + domain);
+		secure && (cookieText += "; secure");
+
+		document.cookie = cookieText;
+	}
+	unset: function(name, path, domain, secure){
+		this.set(name, "", new Date(0), path, domain, secure);
+	}
+};
+
+
+//PPK版本
+var Cookies = {
+	init: function () {
+		var allCookies = document.cookie.split('; ');
+		for (var i = 0, len = allCookies.length; i < len; i++) {
+			var cookiePair = allCookies[i].split('=');
+			this[cookiePair[0]] = cookiePair[1];
+		}
+	},
+	create: function (name,value,days) {
+		if (days) {
+			var date = new Date();
+			date.setTime(date.getTime() + (days*24*60*60*1000));
+			var expires = "; expires=" + date.toGMTString();
+		}
+		else var expires = "";
+		document.cookie = name + "=" + value + expires + "; path=/";
+		this[name] = value;
+	},
+	erase: function (name) {
+		this.create(name,'',-1);
+		this[name] = undefined;
+	}
+};
+Cookies.init();
+
+
+/*###################### 创建目录及隐藏 ######################*/
+function createTOC() {
+	var y = document.createElement('div');
+	y.id = 'innertoc';
+	var a = y.appendChild(document.createElement('span'));
+	a.onclick = showhideTOC;
+	a.id = 'contentheader';
+	a.innerHTML = 'show page contents';
+	var z = y.appendChild(document.createElement('div'));
+	z.onclick = showhideTOC;
+	var toBeTOCced = getElementsByTagNames('h2,h3,h4,h5');
+	if (toBeTOCced.length < 2) return false;
+
+	for (var i=0;i<toBeTOCced.length;i++) {
+		var tmp = document.createElement('a');
+		tmp.innerHTML = toBeTOCced[i].innerHTML;
+		tmp.className = 'page';
+		z.appendChild(tmp);
+		if (toBeTOCced[i].nodeName == 'H4')
+			tmp.className += ' indent';
+		if (toBeTOCced[i].nodeName == 'H5')
+			tmp.className += ' extraindent';
+		var headerId = toBeTOCced[i].id || 'link' + i;
+		tmp.href = '#' + headerId;
+		toBeTOCced[i].id = headerId;
+		if (toBeTOCced[i].nodeName == 'H2') {
+			tmp.innerHTML = 'Top';
+			tmp.href = '#top';
+			toBeTOCced[i].id = 'top';
+		}
+	}
+	return y;
+}
+
+var TOCstate = 'none';
+
+function showhideTOC() {
+	TOCstate = (TOCstate == 'none') ? 'block' : 'none';
+	var newText = (TOCstate == 'none') ? 'show page contents' : 'hide page contents';
+	document.getElementById('contentheader').innerHTML = newText;
+	document.getElementById('innertoc').lastChild.style.display = TOCstate;
+}
+
+/* ######################  检测浏览器引擎和版本、平台、移动  ###################### */
+var client = function(){
+	//@@@@@@  定义相关对象  @@@@@@
+	var engine = {  //浏览器引擎
+		trident: 0,
+		gecko: 0,
+		webkit: 0,
+		khtml: 0,
+		opera: 0,  //引擎：presto
+		ver: null  //完整的版本号
+	};
+	var browser = { //浏览器
+		ie: 0,
+		firefox: 0,
+		konq: 0,
+		opera: 0,
+		chrome: 0,
+		safari: 0,
+		ver: null
+	};
+	var system = {
+		win: false,
+		mac: false,
+		x11: false,
+		//移动设备
+		iphone: false,
+		nokiaN: false,
+		winMobile: false,
+		macMoblie: false,
+		//游戏系统
+		wii: false,
+		ps: false,
+	};
+
+	var ua = navigator.userAgent.toLowerCase();
+	if(window.opera){	
+		engine.ver = browser.ver = window.opera.version();
+		engine.opera = browser.opera = parseFloat(engine.ver);
+	}else if(/applewebkit\/([\d.]+)/.test(ua)){  //引擎webkit
+		engine.ver = RegExp["$1"];
+		engine.webkit = parseFloat(engine.ver);
+
+		//确实是Chrome还是Safari
+		if(/chrome\/([\d.]+)/.test(ua)){
+			browser.ver = RegExp["$1"];
+			browser.chrome = parseFloat(browser.ver);
+		}else if(/version\/([\d.]+)/.test(ua)){
+			browser.ver = RegExp["$1"];
+			browser.safari = parseFloat(browser.ver);
+		}else{
+			//近似地确定版本号
+			var safariVersion = 1;
+			if(engine.webkit < 100){
+				safariVersion = 1;
+			}else if(engine.webkit <312){
+				safariVersion = 1.2;
+			}else if(engine.webkit < 412){
+				safariVersion = 1.3;
+			}else{
+				safariVersion = 2;
+			}
+			browser.safari = browser.ver = safariVersion;
+		}
+	}else if(/khtml\/([\d.]+)/.test(ua) || /konqueror\/([^;]+)/.test(ua)){  //引擎KHTML
+		engine.ver = browser.ver = RegExp("$1");
+		engine.khtml =browser.konq = parseFloat(engine.ver);
+	}else if(/rv:([^\)]+)\) gecko\/(\d{8})/.test(ua)){  //引擎gecko
+		engine.ver = RegExp["$2"];
+		engine.gecko = parseFloat(engine.ver);
+		if(/firefox\/([\d.]+)/.test(ua)){
+			browser.ver = RegExp["$1"];
+			browser.firefox = parseFloat(browser.ver);
+		}
+	}else if(/msie ([\d.]+)/.test(ua)){   
+		engine.ver = browser.ver = RegExp["$1"];
+		engine.trident = browser.ie = parseFloat(browser.ver);
+	}
+
+	browser.ie = engine.trident;
+	browser.opera = browser.opera;
+
+	//@@@@@@  检查平台  @@@@@@	
+	var p;
+	if(browser.firefox != 0){
+		p = navigator.oscpu.toLowerCase();
+	}else{
+		p = navigator.platform.toLowerCase();
+	}
+	system.win = p.indexOf("win") == 0;  //确定此字符串开头
+	system.mac = p.indexOf("mac") == 0;
+	system.x11 = (p.indexOf("linux") == 0) || (p.indexOf("x11") == 0);
+
+	if(system.win){
+		if(/win(?:dows)?\s?([^do]{2})\s?(\d+\.\d+)?/.test(ua)){
+			if(RegExp["$1"] == "nt"){
+				switch(RegExp["$2"]){
+					case "5.0":
+						system.win = "Windows 2000";
+						break;
+					case "5.1":
+						system.win = "Windows XP";
+						break;
+					case "6.0":
+						system.win = "Windows Vista";
+						break;
+					default:
+						system.win = "Windows NT";
+						break;
+				}
+			}else if(RegExp["$1"] == "9x"){
+				system.win = "Windows ME";
+			}else{
+				system.win = RegExp["$1"];
+			}
+		}
+	}
+
+	//@@@@@@  移动设备  @@@@@@
+	system.iphone = ua.indexOf("iphone") > -1;
+	system.ipod = ua.indexOf("ipod") > -1;
+	system.nokiaN = ua.indexOf("nokian") > -1;
+	system.winMobile = (system.win == "ce");
+	system.macMoblie = (system.iphone || system.ipod);
+	//游戏系统
+	system.wii = ua.indexOf("wii") > -1;
+	system.ps = /playstation/i.test(ua);
+
+	return{
+		engine: engine,
+		browser: browser,
+		system: system
+	};
+}();
+
+
+/* ######################  兼容浏览器的事件相关属性和方法  ###################### */
+var eventUtil = {
+	//@@@@@@  对象属性  @@@@@@
+	addHandler: function(element, eventType, eventHandler){ 		//兼容版添加事件处理程序
+		/*------------  更加简洁高效写法  ------------*/
+		element.addEventListener ? element.addEventListener(eventType, eventHandler, false) :
+		element.attachEvent ? element.attachEvent(("on" + eventType), eventHandler) : (element["on" + eventType] = eventHandler);
+	},
+	removeHandler: function(element, eventType, eventHandler){			//兼容版移除事件处理程序函数
+		//易于阅读的写法
+		if(element.removeEventListener){
+			element.removeEventListener(eventType, eventHandler, false);
+		}else if(element.detachEvent){	
+			element.detachEvent(("on" + eventType), eventHandler);
+		}else{			
+			element["on" + eventType] = null;
+		}
+	},
+	getEvent: function(event){				//兼容版获取事件对象
+		return event ? event : window.event;
+	},
+	getTarget: function(event){				//兼容版获取事件目标对象
+		return event.target || event.srcElement;
+	},	
+	getRelatedTarget: function(event){		//获取关联目标节点
+		return event.relatedTarget ? event.relatedTarget : 
+		event.fromElement ? event.fromElement : 
+		event.toElement ? event.toElement : null;
+	},
+	getButton: function(event){
+		if(document.implementation.hasFeature("MouseEvents", "2.0")){
+			return event.button;
+		}else{
+			switch(event.button){
+				case 0:
+				case 1:
+				case 3:
+				case 5:
+				case 7:
+					return 0;
+				case 2:
+				case 6:
+					return 2;
+				case 4:
+					return 1;
+			}
+		}
+	},
+	getCharCode: function(event){			//charCode字符按键的encode编码，keyCode非字符encode编码
+		return typeof event.charCode == "number" ? event.charCode : event.keyCode;
+	},
+	getWheelDelta: function(event){		//滚轮
+		return event.wheelDelta ? (client.engine.opera && client.browser.opera < 9.5 ? -event.wheelDelta :
+			event.wheelDelta) : -event.detail * 40;
+	},
+
+	//@@@@@@  对象方法  @@@@@@
+	preventDefault: function(event){		//兼容版阻止事件发生默认动作
+		event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+	},
+	stopPropagation: function(event){		//兼容版阻止事件发生捕获或冒泡的传播
+		event.stopPropagation ? event.stopPropagation() : (event.returnValue = false);
+	},
+	getClipboardText: function(event){
+		var clipboardData = event.clipboardData || window.clipboardData;
+		return clipboardData.getData("text") || clipboardData.getData("text/plain");
+	},
+	setClipboardText: function(event, value){	//设置剪贴板数据
+		 return event.clipboardData ? event.clipboardData.setData("text/plain", value) :
+		window.clipboardData ? window.clipboardData.setData("text", value) : null;
+	}
+};
+
+
+/* #############################  获取元素框的坐标  ############################ */
+var coord = {
+	getX: function(element){
+		var actualLeft = element.offsetLeft;
+			var current = element.offsetParent;
+			while (current !== null){
+				actualLeft += current.offsetLeft;
+				current = current.offsetParent;
+			}
+			return actualLeft;
+	},
+	getY: function(element){
+			var actualTop = element.offsetTop;
+			var current = element.offsetParent;
+			while (current !== null){
+				actualTop += current.offsetTop;
+				current = current.offsetParent;
+			}
+			return actualTop;
+	},
+};
+
+function getRectCoord(ele){
+	var scrollTop = document.documentElement.scrollTop;
+	var scrollLeft = document.documentElement.scrollLeft;
+	if(ele.getBoundingClientRect){
+		if(typeof arguments.callee.offset != "number"){
+			var temp = document.createElement("div");
+			temp.style.cssText = "positon:absolute;left:0;top:0;";
+			document.body.appendChild(temp);
+			arguments.callee.offset = -temp.getBoundingClientRect().top - scrollTop;
+			document.body.removeChild(temp);
+			temp = null;
+		}
+
+		var rect = element.getBoundingClientRect();
+		var offset = arguments.callee.offset;
+
+		return{
+			left: rect.left + offset,
+			right: rect.right + offset,
+			top: rect.top + offset,
+			bottom: rect.bottom + offset
+		};
+	}else{
+		var actualLeft = getElementLeft(ele);
+		var actualTop = getElementTop(ele);
+
+		return{
+			left: actualLeft - scrollLeft,
+			right: actualLeft - scrollLeft + ele.offsetWidth,
+			top: actualTop- scrollTop,
+			bottom: actualTop - scrollTop + ele.offsetHeigth
+		}
+	}
+}
+
+
+
+/*---------------------------------------------------------------------*/
+/*                         Start  【AJAX模块】                         */
+/*---------------------------------------------------------------------*/
+
+//设计模式版本AJAX请求
+var SimpleHandler = function(){};
+SimpleHandler.prototype = {
+	request: function(type, url, callback, postVars){
+		var xhr = this.createXhrObject();
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState !== 4){return;}
+			(xhr.status === 200 || xhr.status === 304) ? callback.success(xhr.responseText, xhr.responseXML) : 
+				callback.failure(xhr.status);
+		};
+		xhr.open(type, url, true);
+		if(type !== 'POST'){postVars = null;}
+		xhr.send(postVars);
+	},
+	createXhrObject: function(){
+		var methods = {
+			function(){return new XMLHttpRequest();},
+			function(){return new ActiveXObject('MSXML2.XMLHTTP.6.0')},
+			function(){return new ActiveXObject('MSXML2.XMLHTTP.3.0')},
+			function(){return new ActiveXObject('MSXML2.XMLHTTP')}
+		};
+		for(var i = 0, len = methods.length; i <  len; i++){
+			try{
+				methods[i]();
+			}catch(e){
+				continue;
+			}
+			this.createXhrObject = methods[i]();
+			return methods[i]();
+		}
+		throw new Error('SimpleHandler: Could not create an XHR object.');
+	}
+};
+var simpleAjax = new SimpleHandler();
+var resHandler = {
+	success: function(text, xml){
+		var content = xml ? xml : text;
+		//...
+	},
+	failure: function(status){
+		throw new Error("Request failure: " + status);
+	}
+}
+simpleAjax.request('GET', url, resHandler, null);
+
+/* #############################  表单序列化函数  ############################ */
+
+function getText(url, type, isAsy, callback){
+	var req = new XMLHttpRequest();//省略...
+	res.open(type, url, isAsy);
+	req.onreadystatechange = function(){
+		if(req.readyState === 4 && (req.status === 200 || req.status === 304)){
+			var conType = req.getResponseHeader("Content-Type");
+			if(conType.match(/^text/)){		//确保响应是文本
+				callback(req.responseText);		//传给回调函数
+			}
+		}
+	};
+	req.send(null);
+}
+
+/******************************* Ajax模拟超时设置 *********************************/
+var xhr = createXMLHttpRequest();
+xhr.open("GET", url, true); // Server stuck in a loop.
+var requestTimer = setTimeout(function() {
+ 	xhr.abort();     	
+}, MAXIMUM_WAITING_TIME);
+
+xhr.onreadystatechange = function() {
+    if (xhr.readyState != 4)  { return; }
+    clearTimeout(requestTimer);
+    if (xhr.status != 200)  {	       
+       	return;
+	}
+	var serverResponse = xhr.responseText;     
+};
+/**************************************************************************************/
+
+//并发数控制
+
+function startAjax(type, url, isAsy, id, callback){
+	var xhr = new XMLHttpRequest(),
+		MAX_NUM = 6,	//最大并发定义
+		count = 0,		//并发数统计
+		queue = [];		//等待队列
+	xhr.Id = id;
+
+	if(count > MAX_NUM){
+		queue.push(xhr;
+	}else{			
+		sendRequest();	
+	}
+
+	function sendRequest(q){
+		count++;	
+		xhr = q ? q : xhr;	
+		xhr.open(type, url, isAsy);
+		xhr.onreadystatechange = bindcallback;		
+		xhr.send(null);
+	}
+
+	function bindcallback(){
+		if(xhr.readyState === 4){
+			if(xhr.status === 200){
+				callback(xhr);
+				count--;
+				if(queue.length){
+					sendRequest(queue[0]);
+					queue.shift();
+				}
+			}
+		}
+	}
+}
+
+/********************************* 可控并发Ajax方式 ************************************/
+var XMLHttp = {
+	_objPool: [],
+	_getInstance: function() {
+		for (var i = 0; i < this._objPool.length; i++) {
+			if (this._objPool[i].readyState == 0 || this._objPool[i].readyState == 4) {
+				return this._objPool[i];
+			}
+		}
+		// IE5中不支持push方法
+		this._objPool[this._objPool.length] = this._createObj();
+		return this._objPool[this._objPool.length - 1];
+	},
+	_createObj: function() {
+		if (window.XMLHttpRequest) {
+			var objXMLHttp = new XMLHttpRequest();
+		} else {
+			var MSXML = ['MSXML2.XMLHTTP.5.0', 'MSXML2.XMLHTTP.4.0', 'MSXML2.XMLHTTP.3.0', 'MSXML2.XMLHTTP', 'Microsoft.XMLHTTP'];
+			for (var n = 0; n < MSXML.length; n++) {
+				try {
+					var objXMLHttp = new ActiveXObject(MSXML[n]);
+					break;
+				} catch (e) {}
+			}
+		}
+		// mozilla某些版本没有readyState属性
+		if (objXMLHttp.readyState == null) {
+			objXMLHttp.readyState = 0;
+			objXMLHttp.addEventListener("load", function() {
+				objXMLHttp.readyState = 4;
+				if (typeof objXMLHttp.onreadystatechange == "function") {
+					objXMLHttp.onreadystatechange();
+				}
+			}, false);
+		}
+		return objXMLHttp;
+	},
+	// 发送请求(方法[post,get], 地址, 数据, 回调函数)
+	sendReq: function(method, url, data, callback) {
+		var objXMLHttp = this._getInstance();
+		with(objXMLHttp) {
+			try {
+				// 加随机数防止缓存
+				if (url.indexOf("?") > 0) {
+					url += "&randnum=" + Math.random();
+				} else {
+					url += "?randnum=" + Math.random();
+				}
+				open(method, url, true);
+				// 设定请求编码方式
+				setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+				send(data);
+				onreadystatechange = function() {
+					if (objXMLHttp.readyState == 4 && (objXMLHttp.status == 200 || objXMLHttp.status == 304)) {
+						callback(objXMLHttp);
+					}
+				}
+			} catch (e) {
+				alert(e);
+			}
+		}
+	}
+};
+
+//序列化表单
+function formSerialize(form){
+	var parts = new Array();
+	var field = null;
+
+	for(var i = 0, len = form.elements.length; i < len; ++i){
+		field = form.elements[i];
+		switch(field.type){
+			case "select-one":
+			case "select-multiple":
+				for(var j = 0, optLen = field.options.length; j < optLen; ++j){
+					var option = field.options[j];
+					if(option.selected){
+						var optValue = "";
+						option.hasAttribute ? (optValue = (option.hasAttribute("value") ? option.value : option.text)) :   		//功能检测hasAttribute
+											  (optValue = (option.attributes("value").specified ? option.value : option.text));
+						parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(optValue));	//编码
+					}
+				}
+				break;
+			case undefined:
+			case "file":
+			case "submit":
+			case "reset":
+			case "button":
+			case "fieldset": 		//IE中fieldset的type为undefined
+				break;
+			case "radio":
+			case "checkbox":
+				if(!field.checked){
+					break;
+				}
+			default:
+				parts.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
+		}
+	}
+	return parts.join("&");
+}
+
+/* #############################  给URL添加编码后的查询字符串  ############################ */
+function addQueryStringArg(url, name, value){
+	url.indexOf("?") == -1 ? (url += "?") : (url +="&");
+	url += encodeURIComponent(name) + "=" + encodeURIComponent(value);		//确保编码避免URL格式不对引发通信错误
+	return url;
+}
+
+/* #############################  记录错误日志，以URL查询字符串方式，用image对象的src属性传递  ############################ */
+function logError(sev, msg){
+	var img = new Image();
+	img.src = "log.pho?sev=" + encodeURIComponent(sev) + "&msg=" + encodeURIComponent(msg);
+}
+
+//IE 创建xml Dom对象 函数
+function createDocument() {
+    if (typeof arguments.callee.activeXString != "string") {
+        var versions = ["MSXML2.DOMDocument.6.0", "MSXML2.DOMDocument.3.0", "MSXML2.DOMDocument"],
+            i, len;
+        for (i = 0, len = versions.length; i < len; i++) {
+            try {
+                var xmldom = new ActiveXObject(versions[i]);
+                arguments.callee.activeXString = versions[i];
+                return xmldom;
+            } catch (ex) {
+                //跳过
+            }
+        }
+    }
+    return new ActiveXObject(arguments.callee.activeXString);
+}
+
+//解析xml文档 —— 兼容版
+function parserXml(xml){
+	var xmldom = null
+	if(typeof DOMParser != "undefined"){
+		xmldom = (new DOMParser()).parseFromString(xml, "text/xml");
+		var errors = xmldom.getElementsByTagName("parsererror");
+		if(errors.length != 0){
+			throw new Error("XML parsing error: " + errors[0].textContent);
+		}
+	}else if(document.implementation.hasFeature("LS", "3.0")){
+		var implementation = document.implementation;
+		var parser = implementation.createLSParser(implementation.MODE_SYNCHRONOUS, null);
+		var input = implementation.createLSInput();
+		input.stringData = xml;
+		xmldom = parser.parse(input);
+	}else if(typeof ActiveXObject != "undefined"){
+		xmldom = createDocument();
+		xmldom.loadXML(xml);
+		if(xmldom.parseError != 0){
+				throw new Error("XML parsing error: " + xmldom.parseError);
+		}else{
+			throw new Error("No XML parser available");
+		}					
+	}
+	return xmldom;
+}
+
+var xmldom = null;
+try{
+	xmldom = parserXml("<node><child/></node>");
+}catch(error){
+	alert(error.message);
+}
+alert(xmldom.documentElement.firstChild.tagName);
+
+//*********************   序列化xml —— 兼容版    **********************************/
+function serializeXML(xmldom){
+	if(typeof XMLSerializer != "undefined"){
+		return (new XMLSerializer()).serializeToString(xmldom);
+	}else if(document.implementation.hasFeature("LS", "3.0")){
+		var imple = document.implementation;
+		var serializer = imple.createLSSerializer();
+		return serialize.writeToString(xmldom);
+	}else if(typeof xmldom.xml != "undefined"){
+		return xmldom.xml;
+	}else{
+		throw new Error("Could not serialize XML DOM.");
+	}
+}
+
+var xml = serializeXML(xmldom);
+alert(xml);
+
+/* #############################  创建XHR兼容版包含IE6  ############################ */
+function createXHR(){
+	if(typeof XMLHttpRequest != "undefined"){
+		createXHR = function(){
+			return new XMLHttpRequest();
+		};		
+	}else if(typeof ActiveXObject != "undefined"){		
+		var vers = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"];
+		for(var i = 0, len = vers.length; i < len; i++){
+			try{
+				var xhr = new ActiveXObject(vers[i]);				
+				return xhr;
+			}catch (ex){
+				//...
+			}
+		}		
+	}else{
+		throw new Error("No XHR object available.");
+	}
+}
+
+var xhr = createXHR();
+xhr.onreadystatechange = readyStateHandler;
+xhr.open("get", "example.txt", false);
+xhr.setRequestHeader("MyHeader", "MyValue");
+xhr.send(null);
+function readyStateHandler(){		//请求/响应过程的当前活动阶段
+	if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+		alert(xhr.statusText);
+	}else{
+		alert("Request was unsuccessful: " + xhr.status);
+	}
+}
+
+/* #############################  URL中添加查询字符串的标准方法  ############################ */
+function addURLParam(url, name, value){
+	url += (url.indexOf("?") == -1 ? "?" : " & ");
+	url += encodeURIComponent(name) + "=" + encodeURIComponent(value);
+	return url;
+}
+
+/* #############################  提交表单数据——表单数据序列化  ############################ */
+function submitData(){
+	var xhr = createXHR();
+	xhr.onreadystatechange = readyStateHandler;
+	function readyStateHandler(){		//请求/响应过程的当前活动阶段
+		try{
+			if(xhr.readyState == 4){
+				if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+					alert(xhr.statusText);
+				}else{
+					alert("Request was unsuccessful: " + xhr.status);
+				}
+			}
+		}catch(ex){
+			//...
+		}
+	}
+
+	xhr.open("post", "postexample.php", true);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencode");
+	var form = document.getElementById("form");
+	xhr.send(serialize(form));
+}
+
+//    响应进度 目前只有firefox支持
+var xhr = createXHR();
+xhr.onload = function(event){
+	if((xhr.status >= 200 && xhr.status <300) || xhr.status == 304){
+		alert(xhr.responseText);
+	}else{
+		alert("Request was unsuccessful: " + xhr.status);
+	}
+};
+xhr.onprogress = function(event){
+	var divStatus = document.getElementById("status");
+	divStatus.innerHTML = "Received " + event.position + " of " + event.totalSize + " bytes";
+};
+xhr.open("get", "altevents.php", true);
+xhr.send(null);
+
+
+//跨浏览器JSON序列化stringify
+// implement JSON.stringify serialization
+JSON.stringify = JSON.stringify || function (obj) {
+	var t = typeof (obj);
+	if (t != "object" || obj === null) {
+		// simple data type
+		if (t == "string") obj = '"'+obj+'"';
+		return String(obj);
+	}
+	else {
+		// recurse array or object
+		var n, v, json = [], arr = (obj && obj.constructor == Array);
+		for (n in obj) {
+			v = obj[n]; t = typeof(v);
+			if (t == "string") v = '"'+v+'"';
+			else if (t == "object" && v !== null) v = JSON.stringify(v);
+			json.push((arr ? "" : '"' + n + '":') + String(v));
+		}
+		return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+	}
+};
+
+
+/*########################## PPK版的Ajax ###########################*/
+function sendRequest(url,callback,postData) {
+	var req = createXMLHTTPObject();
+	if (!req) return;
+	var method = (postData) ? "POST" : "GET";
+	req.open(method,url,true);
+	req.setRequestHeader('User-Agent','XMLHTTP/1.0');
+	req.page = url;
+	if (postData)
+		req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	req.onreadystatechange = function () {
+		if (req.readyState != 4) return;
+		if (req.status != 200 && req.status != 304) {
+		//	alert('HTTP error ' + req.status);
+			return;
+		}
+		callback(req);
+	}
+	if (req.readyState == 4) return;
+	req.send(postData);
+}
+
+function XMLHttpFactories() {
+	return [
+		function () {return new XMLHttpRequest()},
+		function () {return new ActiveXObject("Msxml6.XMLHTTP")},
+		function () {return new ActiveXObject("Msxml3.XMLHTTP")},
+		function () {return new ActiveXObject("Microsoft.XMLHTTP")}
+	];
+}
+
+function createXMLHTTPObject() {
+	var xmlhttp = false;
+	var factories = XMLHttpFactories();
+	for (var i=0;i<factories.length;i++) {
+		try {
+			xmlhttp = factories[i]();
+		}
+		catch (e) {
+			continue;
+		}
+		break;
+	}
+	return xmlhttp;
+}
+
+
+/*---------------------------------------------------------------------*/
+/*                         End  【AJAX模块】                           */
+/*---------------------------------------------------------------------*/
+
+
+
+
+
+//////////////////////   通过继承来创建新对象   ////////////////////////
+function inherit(parent){
+	parent == null && throw TypeError();
+	if(Object.create){return Object.create(parent);}
+
+	var t = typeof parent;
+	if(t !== "object" && t !== "function"){throw TypeError();}
+	function f(){};
+	f.prototype = parent;
+	return new f();
+}
+
+//////////////////////   用来枚举对象属性的工具函数  ///////////////////////
+function extend(o, p){			//将p属性全部复制到o中，同名覆盖
+	for(prop in p){
+		o[prop] = p[prop];
+	}
+	return o;
+}
+
+function merge(o, p){
+	for(prop in p){
+		if(o.hasOwnProperty[prop]){continue;}	//跳过o中已经存在的属性
+		o[prop] = p[prop];
+	}
+	return o;
+}
+
+function restrict(o, p){
+	for(prop in o){
+		if(!(prop in p)){delete o[prop];}		//删除p中不存在的o中存在的属性
+	}
+	return o;
+}
+
+function subtract(o, p){
+	for(prop in p){
+		delete o[prop];				//删除o中同名的所有属性
+	}
+	return o;
+}
+
+function union(o, p){			//并集中相交部分使用P属性
+	return extend(extend({}, o), p);
+}
+
+function intersection(o, p){			//交集,使用o属性
+	return restrict(extend({}, o), p);
+}
+
+function keys(o){			//返回o中所有可枚举属性名字
+	if(typeof o !== "object"){throw TypeError();}
+	var result = [];
+	for(var prop in o){
+		if(o.hasOwnProperty(prop)){
+			result.push(prop);
+		}		
+	}
+	return result;
+}
+
+/* #############################  跨域访问  ############################ */
+(function(){
+	var isIE8 = window.XDomainRequest ? true : false,
+		invocation = createCrossDomainRequest(),
+		url = "http://www.phobos7.co.uk/research/xss/simple.p";
+
+	function createCrossDomainRequest(url, handler){
+		var request;
+		request = isIE8 ? new window.XDomainRequest() : new XMLHttpRequest(); 
+		return request;
+	}
+	function callOtherDomain(){
+		if(invocation){
+			if(isIE8){
+				invocation.onload = outputResult;
+				invocation.open("GET", url, true);
+				invocation.send();
+			}else{
+				invocation.open("GET", url, true);
+				invocation.onreadystatechange = handler;
+				invocation.send();
+			}
+		}else{
+			var text = "No invocation TookPlace At All",
+				textNode = document.createTextNode(text),
+				textDiv = document.getElementById("textDiv");
+				textDiv.appendChild(textNode);
+		}
+	}
+	function handler(evtXHR){
+		invocation.readyState == 4 && invocation.status == 200 ? outputResult() : alert("invocation Errors Occured");
+	}
+	function outputResult(){
+		document.getElementById("textDiv").innerHTML += invocation.responseText;
+	}
+})();
+
+
+///////////////    作用域安全的构造函数   //////////////////
+function Person(name, age){
+	if(this instanceof Person){
+		this.name = name;
+		this.age = age;
+	}else{
+		return new Person(name, age);
+	}
+}
+
+
+/////////////////////////////////////      斐波那契算法      /////////////////////////
+function calculateFibonacci(num){	////算法主体，学习算法的朋友可以自己画画，fibonacci在自然规律中无处不在
+	return (num === 0 || num === 1) ? num : (arguments.callee(num - 1) + arguments.callee(num - 2));
+}
+
+function doStuff(num, successCallback, errorCallback){
+	try{
+		var results = [];
+		for(var i = 0; i < num - 1; i++){
+			var result = calculateFibonacci(i);
+			results.push(result);
+			console.log(result);
+		}
+		console.log("Calculate finished!");
+		if(typeof successCallback === "function"){
+			successCallback(results.join(", "));
+		}
+	}catch(ex){
+		typeof errorCallback === "function" && errorCallback(ex.message);
+	}
+}
+
+doStuff(5, function(result){
+	console.log("this is result: " + result);
+}, function(error){
+	console.log("Something bad happened: " + error);
+});
+
+
+///////////////////  函数绑定  //////////////////////
+function bind(fn, context){
+	return function(){
+		return fn.apply(context, arguments);
+	};
+}
+
+//柯里化函数
+function curry(fn){
+	var args = Array.prototype.slice.call(arguments, 1);
+	return function(){
+		var innerArgs = Array.prototype.slice.call(arguments);
+		var finalArgs = args.concat(innerArgs);
+		return fn.apply(null, finalArgs);
+	};
+}
+
+//柯里化的函数绑定
+function bind(fn, context){
+	var args = Array.prototype.slice.call(arguments, 2);
+	return function(){
+		var innerArgs = Array.prototype.slice.call(arguments);
+		var finalArgs = args.concat(innerArgs);
+		return fn.apply(context, finalArgs);
+	};
+}
+
+
+/*---------------------------------------------------------------------*/
+/*                         Start  【Tween公式】                           */
+/*---------------------------------------------------------------------*/
+
+//修正版少参数版
+var Ease = {
+	QuadIn: function(p){
+		return Math.pow(p, 2);
+	},
+	QuadOut: function(p){
+		return -(Math.pow((p-1), 2) -1);
+	},
+	QuadInOut: function(p){
+		if ((p/=0.5) < 1) return 0.5*Math.pow(p,2);
+		return -0.5 * ((p-=2)*p - 2);
+	},
+	CubicIn: function(p){
+		return Math.pow(p, 3);
+	},
+	CubicOut: function(p){
+		return (Math.pow((p-1), 3) +1);
+	},
+	CubicInOut: function(p){
+		if ((p/=0.5) < 1) return 0.5*Math.pow(p,3);
+		return 0.5 * (Math.pow((p-2),3) + 2);
+	},
+	QuartIn: function(p){
+		return Math.pow(p, 4);
+	},
+	QuartOut: function(p){
+		return -(Math.pow((p-1), 4) -1)
+	},
+	QuartInOut: function(p){
+		if ((p/=0.5) < 1) return 0.5*Math.pow(p,4);
+		return -0.5 * ((p-=2)*Math.pow(p,3) - 2);
+	},
+	QuintIn: function(p){
+		return Math.pow(p, 5);
+	},
+	QuintOut: function(p){
+		return (Math.pow((p-1), 5) +1);
+	},
+	QuintInOut: function(p){
+		if ((p/=0.5) < 1) return 0.5*Math.pow(p,5);
+		return 0.5 * (Math.pow((p-2),5) + 2);
+	},
+	SineIn: function(p){
+		return -Math.cos(p * (Math.PI/2)) + 1;
+	},
+	SineOut: function(p){
+		return Math.sin(p * (Math.PI/2));
+	},
+	SineInOut: function(p){
+		return (-.5 * (Math.cos(Math.PI*p) -1));
+	},
+
+	ExpoIn: function(p){
+		return (p==0) ? 0 : Math.pow(2, 10 * (p - 1));
+	},
+	ExpoOut: function(p){
+		return (p==1) ? 1 : -Math.pow(2, -10 * p) + 1;
+	},
+	ExpoInOut: function(p){
+		if(p==0) return 0;
+		if(p==1) return 1;
+		if((p/=0.5) < 1) return 0.5 * Math.pow(2,10 * (p-1));
+		return 0.5 * (-Math.pow(2, -10 * --p) + 2);
+	},
+	CircIn: function(p){
+		return -(Math.sqrt(1 - (p*p)) - 1);
+	},
+	CircOut: function(p){
+		return Math.sqrt(1 - Math.pow((p-1), 2))
+	},
+	CircInOut: function(p){
+		if((p/=0.5) < 1) return -0.5 * (Math.sqrt(1 - p*p) - 1);
+		return 0.5 * (Math.sqrt(1 - (p-=2)*p) + 1);
+	},
+	BackIn: function(p) {
+		var s = 1.70158;
+		return p*p*((s+1)*p - s);
+	},
+	BackOut: function(p) {
+		var s = 1.70158;
+		return (p-=1)*p*((s+1)*p + s) + 1;
+	},
+	BackInOut: function(p) {
+		var s = 1.70158;
+		return ((p/=0.5) < 1) ? 0.5*(p*p*(((s*=(1.525))+1)*p - s)) : 0.5*((p-=2)*p*(((s*=(1.525))+1)*p + s) + 2);
+	},	
+	BounceOut: function(p){
+		if ((p) < (1/2.75)) {
+			return (7.5625*p*p);
+		} else if (p < (2/2.75)) {
+			return (7.5625*(p-=(1.5/2.75))*p + .75);
+		} else if (p < (2.5/2.75)) {
+			return (7.5625*(p-=(2.25/2.75))*p + .9375);
+		} else {
+			return (7.5625*(p-=(2.625/2.75))*p + .984375);
+		}
+	},
+	BouncePast: function(p) {
+		if (p < (1/2.75)) {
+			return (7.5625*p*p);
+		} else if (p < (2/2.75)) {
+			return 2 - (7.5625*(p-=(1.5/2.75))*p + .75);
+		} else if (p < (2.5/2.75)) {
+			return 2 - (7.5625*(p-=(2.25/2.75))*p + .9375);
+		} else {
+			return 2 - (7.5625*(p-=(2.625/2.75))*p + .984375);
+		}
+	},
+	FromTo: function(p) {
+		if ((p/=0.5) < 1) return 0.5*Math.pow(p,4);
+		return -0.5 * ((p-=2)*Math.pow(p,3) - 2);
+	},
+	From: function(p) {
+		return Math.pow(p,4);
+	},
+	To: function(p) {
+		return Math.pow(p,0.25);
+	},
+	Linear:  function(p) {
+		return p
+	},
+	Sinusoidal: function(p) {
+		return (-Math.cos(p*Math.PI)/2) + 0.5;
+	},
+	Reverse: function(p) {
+		return 1 - p;
+	},
+	Mirror: function(p, ts) {
+		ts = ts || Tween.Sinusoidal;
+		if(p<0.5)
+			return ts(p*2);
+		else
+			return ts(1-(p-0.5)*2);
+	},
+	Flicker: function(p) {
+		var p = p + (Math.random()-0.5)/5;
+		return Tween.Sinusoidal(p < 0 ? 0 : p > 1 ? 1 : p);
+	},
+	Wobble: function(p) {
+		return (-Math.cos(p*Math.PI*(9*p))/2) + 0.5;
+	},
+	Pulse: function(p, pulses) {
+		return (-Math.cos((p*((pulses||5)-.5)*2)*Math.PI)/2) + .5;
+	},
+	Blink: function(p, blinks) {
+		return Math.round(p*(blinks||5)) % 2;
+	},
+	Spring: function(p) {
+		return 1 - (Math.cos(p * 4.5 * Math.PI) * Math.exp(-p * 6));
+	},
+	Elastic: function(p) {
+		return -1 * Math.pow(4,-8*p) * Math.sin((p*6-1)*(2*Math.PI)/2) + 1;
+	},	
+	None: function(p){
+		return 0
+	},
+	Full: function(p){
+		return 1
+	}
+}
+
+
+
+
+//原版多参数
+var Tween = {
+	  Linear: function(t,b,c,d){ return c*t/d + b; },
+	  //平方
+	  QuadIn: function(t,b,c,d){
+		return c*(t/=d)*t + b;
+	  },
+	  QuadOut: function(t,b,c,d){
+		return -c *(t/=d)*(t-2) + b;
+	  },
+	  QuadInOut: function(t,b,c,d){
+		if ((t/=d/2) < 1) return c/2*t*t + b;
+		return -c/2 * ((--t)*(t-2) - 1) + b;
+	  },
+	  //立方
+	  CubicIn: function(t,b,c,d){
+		return c*(t/=d)*t*t + b;
+	  },
+	  CubicOut: function(t,b,c,d){
+		return c*((t=t/d-1)*t*t + 1) + b;
+	  },
+	  CubicInOut: function(t,b,c,d){
+		if ((t/=d/2) < 1) return c/2*t*t*t + b;
+		return c/2*((t-=2)*t*t + 2) + b;
+	  },
+	  //四次方
+	  QuartIn: function(t,b,c,d){
+		return c*(t/=d)*t*t*t + b;
+	  },
+	  QuartOut: function(t,b,c,d){
+		return -c * ((t=t/d-1)*t*t*t - 1) + b;
+	  },
+	  QuartInOut: function(t,b,c,d){
+		if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
+		return -c/2 * ((t-=2)*t*t*t - 2) + b;
+	  },
+	  //五次方
+	  QuintIn: function(t,b,c,d){
+		return c*(t/=d)*t*t*t*t + b;
+	  },
+	  QuintOut: function(t,b,c,d){
+		return c*((t=t/d-1)*t*t*t*t + 1) + b;
+	  },
+	  QuintInOut: function(t,b,c,d){
+		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
+		return c/2*((t-=2)*t*t*t*t + 2) + b;
+	  },
+	  //sin
+	  SineIn: function(t,b,c,d){
+		return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+	  },
+	  SineOut: function(t,b,c,d){
+		return c * Math.sin(t/d * (Math.PI/2)) + b;
+	  },
+	  SineInOut: function(t,b,c,d){
+		return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+	  },
+	  ExpoIn: function(t,b,c,d){
+		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
+	  },
+	  ExpoOut: function(t,b,c,d){
+		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+	  },
+	  ExpoInOut: function(t,b,c,d){
+		if (t==0) return b;
+		if (t==d) return b+c;
+		if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
+		return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
+	  },
+	  CircIn: function(t,b,c,d){
+		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
+	  },
+	  CircOut: function(t,b,c,d){
+		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
+	  },
+	  CircInOut: function(t,b,c,d){
+		if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
+		return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
+	  },
+	//橡皮筋
+	  ElasticIn: function(t,b,c,d,a,p){
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (!a || a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+	  },
+	  ElasticOut: function(t,b,c,d,a,p){
+		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
+		if (!a || a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		return (a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b);
+	  },
+	  ElasticInOut: function(t,b,c,d,a,p){
+		if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
+		if (!a || a < Math.abs(c)) { a=c; var s=p/4; }
+		else var s = p/(2*Math.PI) * Math.asin (c/a);
+		if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+		return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
+	  },
+	
+	  BackIn: function(t,b,c,d,s){
+		s = 1.70158 || s;
+		return c*(t/=d)*t*((s+1)*t - s) + b;
+	  },
+	  BackOut: function(t,b,c,d,s){
+		s = 1.70158 || s;
+		return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+	  },
+	  BackInOut: function(t,b,c,d,s){
+		s = 1.70158 || s;
+		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+	  },
+	//反弹
+	  BounceIn: function(t,b,c,d){
+		return c - Ease.BounceOut(d-t, 0, c, d) + b;
+	  },
+	  BounceOut: function(t,b,c,d){
+		if ((t/=d) < (1/2.75)) {
+		  return c*(7.5625*t*t) + b;
+		} else if (t < (2/2.75)) {
+		  return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
+		} else if (t < (2.5/2.75)) {
+		  return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
+		} else {
+		  return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
+		}
+	  },
+	  BounceInOut: function(t,b,c,d){
+		if (t < d/2) return Ease.BounceIn(t*2, 0, c, d) * .5 + b;
+		else return Ease.BounceOut(t*2-d, 0, c, d) * .5 + c*.5 + b;
+	  },
+}
+
+
+/*---------------------------------------------------------------------*/
+/*                         End  【Tween公式】                           */
+/*---------------------------------------------------------------------*/
+
+
+
+/*************************************************************************************/
+/*************************************************************************************/
+/*************************************************************************************/
+/*************************************************************************************/
+
+/////////////////////////////  js淡入淡出  ////////////////////////////////////
+function bind(fn, context){
+	var args = Array.prototype.slice.call(arguments, 2);
+	return function(){
+		var innerArgs = Array.prototype.slice.call(arguments);
+		var finalArgs = args.concat(innerArgs);
+		return fn.apply(context, finalArgs);
+	};
+}
+var addEvent = function(ele, event, fn){
+	ele.addEventListener ? ele.addEventListener(event, fn, false) :
+	ele.attachEvent ? ele.attachEvent("on" + event, fn) : (ele["on" + event] = fn);
+};
+var animation = {
+	config: {
+		interval: 17,
+		show: true,
+		distance: 0,
+		distanceW: 0				
+	},
+	calculate: function(strSpeed, height, width){
+		var speed = this.speedFn(strSpeed),
+			i = this.config.interval;
+		return typeof height === "undefined" && typeof width === "undefined" ?
+		{
+			frames: (speed - 0) / i,
+			step: i / (speed - 0)
+		} : {
+			frames: (speed - 0) / i,
+			step: i * height / (speed - 0),
+			stepw: i * width / (speed - 0)
+		}
+	},
+	trim: function(str){
+		//return str.replace(/^\s*/, '').replace(/\s*$/, '');
+		return str.replace(/^\s*|\s*$/, '');
+	},
+	speedFn: function(strSpeed){
+		strSpeed = (this.trim(strSpeed)).toLowerCase();
+		switch(strSpeed){
+			case "fastest":
+				return 400;
+			case "faster":
+				return 500;
+			case "fast":
+				return 600;
+			case "normal":
+				return 700;
+			case "slow":
+				return 800;
+			case "slower":
+				return 900;
+			case "slowest":
+				return 1000;
+			case "debug":
+				return 2000;
+			default:
+				return 500;
+		}
+	},
+	fadeOut: function(ele, strSpeed){					
+		var count = 0, c = this.config, s = ele.style,
+			m$ = this.calculate(strSpeed);
+		ele.currentStyle ? (s.filter = "alpha(opacity=100)") : s.opacity = 1;
+
+		try{
+			setTimeout(function(){
+				count++;
+				if(count > m$.frames){							
+					ele.currentStyle ? (s.filter = "alpha(opacity=0)") : s.opacity = 0;
+				}else{
+					if(!ele.currentStyle){
+						s.opacity -= m$.step;
+					}else{
+						var f = parseFloat(ele.currentStyle.filter.match(/\d+/).toString());
+						f -= m$.step * 100;
+						s.filter = "alpha(opacity=" + f + ")";
+					}
+					setTimeout(arguments.callee, c.interval);
+				}
+			}, c.interval); 
+		}catch(ex){
+			console.log("fadeOut error, " + ex.message);
+		}
+		c.show = false;
+	},
+	fadeIn: function(ele, strSpeed){
+		var count = 0, c = this.config, s = ele.style,
+			m$ = this.calculate(strSpeed);
+		ele.currentStyle ? (s.filter = "alpha(opacity=0)") : s.opacity = 0;
+
+		try{
+			setTimeout(function(){
+				count++;
+				if(count > m$.frames){							
+					ele.currentStyle ? (s.filter = "alpha(opacity=100)") : s.opacity = 1;
+				}else{
+					if(ele.currentStyle){
+						var f = parseFloat(ele.currentStyle.filter.match(/\d+/).toString());
+						f += m$.step * 100;
+						s.filter = "alpha(opacity=" + f + ")";
+					}else{
+						s.opacity = parseFloat(s.opacity) + m$.step;
+					}
+					setTimeout(arguments.callee, c.interval);
+				} 
+			}, c.interval); 
+		}catch(ex){
+			console.log("fadeIn error, " + ex.message);
+		}
+		c.show = true;
+	},
+	fadeToggle: function(ele, strSpeed){
+		var self = this;
+		setTimeout(function(){						
+			self.config.show ? self.fadeOut(ele, strSpeed) : self.fadeIn(ele, strSpeed);
+		}, 0);
+	},
+	slideOut: function(ele, strSpeed){
+		var count = 0, u = "px", s = ele.style,
+			c = this.config, cs = window.getComputedStyle ? window.getComputedStyle(ele) : ele.currentStyle,
+			h = s.height = c.distance = parseFloat(cs["height"]),
+			w = s.width = c.distanceW = parseFloat(cs["width"]);
+
+		try{
+			var	m$ = this.calculate(strSpeed, h, w);
+			setTimeout(function(){
+				count++;
+				if(count > m$.frames || parseFloat(s.width) < m$.stepw || parseFloat(s.height) < m$.step){
+					s.height = 0;
+					s.width = 0;
+				}else{
+					s.height = (parseFloat(s.height) - m$.step) + u;
+					s.width = (parseFloat(s.width) - m$.stepw) + u;
+					setTimeout(arguments.callee, c.interval);
+				}
+			}, c.interval); 
+		}catch(ex)
+		{
+			console.log("slideOut error, " + ex.message);
+		}
+		c.show = false;
+	},
+	slideIn: function(ele, strSpeed){
+		var count = 0, u = "px", s = ele.style,
+			c = this.config, cs = window.getComputedStyle ? window.getComputedStyle(ele) : ele.currentStyle,
+			h = c.distance,
+			w = c.distanceW;
+		try{
+			var	m$ = this.calculate(strSpeed, h, w);
+			setTimeout(function(){
+				count++;
+				if(count > m$.frames || parseFloat(s.width) > c.distanceW || parseFloat(s.height) > c.distance){							
+					s.height = c.distance + u;
+					s.width = c.distanceW + u;
+				}else{
+					s.height = (parseFloat(s.height) + m$.step) + u;
+					s.width = (parseFloat(s.width) + m$.stepw) + u;
+					setTimeout(arguments.callee, c.interval);
+				}
+			}, c.interval);
+		}catch(ex){
+			console.log("slideOut error, " + ex.message);
+		}
+		c.show = true; 
+	},
+	slideToggle: function(ele, strSpeed){
+		this.config.show ? this.slideOut(ele, strSpeed) : this.slideIn(ele, strSpeed);
+	}
+};
+
+addEvent(btn, "click", bind(animation.fadeToggle, animation, ul, "normal"));
+
+
+function EventTarget(){			//自定义事件
+	this.handlers = {};
+}
+
+EventTarget.prototype = {
+	constructor: EventTarget,
+	addHandler: function(type, handler){		//添加事件处理程序
+		typeof this.handlers[type] == "undefined" && (this.handlers[type] = []);
+		this.handlers[type].push(handler);
+	},
+	fire: function(event){						//触发事件
+		event.target || (event.target = this);
+		if(this.handlers[event.type] instanceof Array){
+			var handlers = this.handlers[event.type];
+			for(var i = 0, len = handlers.length; i < len; i++){
+				handlers[i](event);
+			}
+		}
+	},
+	removeHandler: function(type, handler){
+		if(this.handlers[type] instanceof Array){
+			var handlers = this.handlers[type];
+			for(var i = 0, len = handlers.length; i < len; i++){
+				if(handlers[i] === handler){
+					break;
+				}
+			}
+			handlers.splice(i, 1);						
+		}
+	}
+};
+
+/*************************************************************************************/
+							/*  拖放模块  */
+/*************************************************************************************/
+(function(){
+	var addEvent = function(ele, event, fn){
+		ele.addEventListener ? ele.addEventListener(event, fn, false) :
+		ele.attachEvent ? ele.attachEvent("on" + event, fn) : (ele["on" + event] = fn);
+	};
+	var removeEvent = function(e, event, fn){	
+		if(e.removeEventListener){
+			e.removeEventListener(event, fn, false);
+		}else if(e.detachEvent){	
+			e.detachEvent(("on" + event), fn);
+		}else{			
+			e["on" + event] = null;
+		}
+	};
+
+	var dragDrop = (function(){			//拖放模块
+		var dragging = null,
+			diffX = 0, diffY = 0;
+			ddEvent = new EventTarget();
+
+		function handleEvent(event){
+			event = event || window.event;
+			var target = event.target || event.srcElement;
+			switch(event.type){
+				case "mousedown":
+					if(target.className.indexOf("draggable") > -1){
+						dragging = target;
+						diffX = event.clientX - div.offsetLeft;
+						diffY = event.clientY - div.offsetTop;
+						ddEvent.fire({type: "dragstart", target: dragging, x: div.style.left, y: div.style.top});
+					}
+					break;
+				case "mousemove":
+					if(dragging !== null){
+						event = event || window.event;
+						throttle(dragFn, null, event, diffX, diffY, dragging);
+						ddEvent.fire({type: "drag", target: dragging, x: div.style.left, y: div.style.top});
+					}
+					break;
+				case "mouseup":							
+					ddEvent.fire({type: "dragend", target: dragging, x: div.style.left, y: div.style.top});
+					dragging = null;
+					break;
+			}
+		}
+		ddEvent.enable = function(){
+				addEvent(document, "mousedown", handleEvent);
+				addEvent(document, "mousemove", handleEvent);
+				addEvent(document, "mouseup", handleEvent);
+		};
+		ddEvent.disable = function(){
+				removeEvent(document, "mousedown", handleEvent);
+				removeEvent(document, "mousemove", handleEvent);
+				removeEvent(document, "mouseup", handleEvent);
+		};	
+		return ddEvent;		
+	})();
+
+	dragDrop.enable();
+
+	dragDrop.addHandler("dragstart", function(e){
+		status.innerHTML = "Started dragging " + e.target.id;
+	});
+	dragDrop.addHandler("drag", function(e){
+		status.innerHTML = "<br /> Dragged " + e.target.id + " to (" + e.x + ", " + e.y + ")";
+	});
+	dragDrop.addHandler("dragend", function(e){
+		status.innerHTML += "<br /> Dropped " + e.target.id + " at (" + e.x + ", " + e.y + ")";
+	});
+
+	function dragFn(e, x, y, ele){
+		var w = window, d = document, de = d.documentElement, g = d.getElementsByTagName('body')[0],
+			pw = w.innerWidth || de.clientWidth || g.clientWidth, 
+			ph = w.innerHeight || de.clientHeight || g.clientHeight,
+			ew = w.getComputedStyle ? parseInt(w.getComputedStyle(div).width) : parseInt(ele.currentStyle.width);
+			eh = w.getComputedStyle ? parseInt(w.getComputedStyle(div).height) : parseInt(ele.currentStyle.height);
+
+		div.style.left = (e.clientX >= x && e.clientX < (pw - ew + x)) ? ((e.clientX - x) + 'px') :
+							e.clientX >= (pw - ew + x) ? pw - ew : 0;
+		div.style.top = (e.clientY > y && e.clientY < (ph - eh + y)) ? ((e.clientY - y) + 'px') :
+							e.clientY >= (ph - eh + y) ? ph - eh : 0;
+		div.innerHTML = "(" + div.style.left + ", " + div.style.top + ")";				
+	}			
+
+	function throttle(method, context, arg, x, y, ele){
+		clearTimeout(method.tId);
+		method.tId = setTimeout(function(){
+			method.call(context, arg, x, y, ele);
+		}, 0);
+	}
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*#################################  预留拖拽大小  #################################*/
+
+/*#################################  预留拖拽大小  #################################*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*************************************************************************************/
+
+
+/*************************************************************************************/
+//////////////////      计时器动态修改      //////////////////
+var counter = 10;
+var myFunction = function(){
+    clearInterval(interval);
+    counter += 10;
+    console.log(counter);
+    interval = setInterval(myFunction, counter);
+}
+var interval = setInterval(myFunction, counter);
+
+/*-------------------------------------------------*/
+var setVariableInterval = function(callbackFunc, timing){
+	var that = this;
+	var variableInterval = {
+		interval: timing,
+		callback: callbackFunc,
+		stopped: false,
+		selt: this,
+		runLoop: function(){
+			if(variableInterval.stopped){return;}
+			var result = variableInterval.callback.call(variableInterval);
+			if(typeof result == 'number'){
+				if(result === 0){return;}
+				variableInterval.interval = result;
+			}
+			variableInterval.loop();
+		},
+		stop: function(){
+			this.stopped = true;
+			window.clearTimeout(this.timer);
+		},
+		start: function(){
+			this.stopped = false;
+			return this.loop();
+		},
+		loop: function(){
+			this.timer = setTimeout(variableInterval.runLoop, variableInterval.interval);
+			return this;
+		}
+	};
+	return variableInterval.start();
+};
+
+//Example use
+var vi = setVariableInterval(function() {  
+	var interval = this.interval;
+	console.log(interval);
+
+	if (interval > 4000){this.stop()};
+	return interval + 100;
+}, 200);  
+
+setTimeout(function() {
+  	vi.interval = 350;
+}, 1000);
+
+setTimeout(function() {
+  	vi.interval = 100;
+  	vi.start();
+}, 600);
+
+/*-------------------------------------------------------------*/
+function setDeceleratingTimeout(callback, factor, times){	//times - 次数    factor减速因子
+	var internalCallback = (function(t, counter){
+		return function(){
+			if(--t > 0){
+				setTimeout(internalCallback, ++counter + factor);
+				callback();
+			}
+		};
+	})(times, 10);
+
+	setTimeout(internalCallback, factor);
+}
+
+setDeceleratingTimeout(function(){
+	console.log('hi');
+}, 5, 100);
+
+
+////////////////////////////////////     JSON解析和序列化方法    ////////////////////////////////////////
+if(!window.JSON){
+	window.JSON = {
+		parse: function(sJson){return eval("(" + sJson + ")");},
+		stringify: function(vContent){
+			if(vContent instanceof Object){
+				var sOutput = "";
+				if(vContent.constructor === Array){
+					for(var i = 0, len = vContent.length; i < len; sOutput += this.stringify(vContent[i]) + ",", i++);
+					return "[" + sOutput.substr(0, sOutput.length - 1) + "]";
+				}
+				if(vContent.toString !== Object.prototype.toString){
+					return "\"" + vContent.toString().replace(/"/g, "\\$&") + "\"";
+				}
+				for(var sProp in vContent){
+					sOutput += "\"" + sProp.replace(/"/g, "\\$&") + "\":" + this.stringify(vContent[sProp]) + ","; 
+				}
+				return "{" + sOutput.substr(0, sOutput.length - 1) + "}";
+			}
+			return typeof vContent === "string" ? "\"" + vContent.replace(/"/g, "\\$&") + "\"" : String(vContent);
+		}
+	};
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+/************************************************************************/
+
+//实现数组分块，需要运行长时间的处理进行分块，队列执行
+function chunk(array, process, context){
+	setTimeout(function(){
+		var item = array.shift();	//移出首位元素并返回
+		process.call(context, item);
+
+		if(array.length > 0){
+			setTimeout(arguments.callee, 100);
+		}
+	}, 100);
+}
+
+/// 函数节流思路，非函数实现
+var processor = {
+	timeoutId: null,
+	performProcessing: function(){
+		//实际执行的代码
+	},
+
+	//初始处理调用的方法
+	process: function(){
+		clearTimeout(this.timeoutId);
+		var that = this;
+		this.timeoutId = setTimeout(function(){
+			that.performProcessing();
+		}, 100);
+	}
+};
+processor.process();	//开始运行
+
+///尝试实现
+function throttle(method, context, arg1){
+	clearTimeout(method.tId);
+	method.tId = setTimeout(function(){
+		method.call(context, age1);
+	}, 100);
+}
+
+
+/************************************************************************/
+
+						   /*   自定义事件   */
+
+/************************************************************************/
+function EventTarget(){
+	this.handlers = {};
+}
+
+EventTarget.prototype = {
+	constructor: EventTarget,
+	addHandler: function(type, handler){
+		typeof this.handlers[type] == "undefined" && (this.handlers[type] = []);
+		console.log("Before push, the array value: " + this.handlers[type]);
+		this.handlers[type].push(handler);
+		console.log("After push, the array value: " + this.handlers[type]);
+	},
+	fire: function(event){
+		event.target || (event.target = this);
+		if(this.handlers[event.type] instanceof Array){
+			var handlers = this.handlers[event.type];
+			for(var i = 0, len = handlers.length; i < len; i++){
+				handlers[i](event);
+			}
+		}
+	},
+	removeHandler: function(type, handler){
+		if(this.handlers[type] instanceof Array){
+			var handlers = this.handlers[type];
+			for(var i = 0, len = handlers.length; i < len; i++){
+				if(handlers[i] === handler){
+					break;
+				}
+			}
+			handlers.splice(i, 1);
+			console.log("After remove, the array value: " + (this.handlers[type] && "null"));
+		}
+	}
+};
+
+//usage
+function messageHandler(event){
+	console.log("You want to output info: " + event.message);
+}
+
+var target = new EventTarget();
+target.addHandler("message", messageHandler);
+target.fire({"type":"message", "message": "event message - very fine!"});
+
+target.removeHandler("message", messageHandler);
+target.fire({"type":"message", "message": "event message - very fine!"});
+
+//寄生组合式继承
+function inheritPrototype(sub, sup){
+	var prototype = Object(sup.prototype);
+	prototype.constructor = sub;
+	sub.prototype = prototype;
+}
+
+function Person(name, age){
+	EventTarget.call(this);
+	this.name = name;
+	this.age = age;
+}
+
+inheritPrototype(Person, EventTarget);
+Person.prototype.say = function(message){
+	this.fire({type:"message", message: "this is a message"});
+};
+
+
+//******************  继承  ******************//
+function Person(name){
+	this.name = name;
+}
+Person.prototype.getName = function(){
+	return this.name;
+}
+
+function Author(name, book){
+	Person.call(this, name);
+	this.book = book;
+}
+Author.prototype = new Person();
+Author.prototype.constructor = Person;
+Author.prototype.getBook = function(){
+	return this.book;
+}
+
+//继承函数
+function Extend(sup, sub){
+	var F = function(){};	//创建新函数对象，避免调用sup构造函数，特别是sup庞大的情况下
+	F.prototype = sup.prototype;
+	sub.prototype = new F();
+	sub.prototype.constructor = sub;
+}
+
+//扩展版
+function ExtendUpdated(){sup, sub}{
+	var F = function(){};
+	F.prototype = sup.prototype;
+	sub.prototype = new F();
+	sub.prototype.constructor = sub;
+
+	sub.sup = sup.prototype;
+	if(sup.prototype.constructor == Object.prototype.constructor){
+		sup.prototype.constructor = sup;
+	}
+}
+
+//对象字面量方式
+var Person = {
+	name: "default name",
+	info: {
+		age: 27,
+		job: 'programer'
+	},
+	getName: function(){
+		return this.name;
+	}
+};
+
+/*****************   克隆函数   ****************/
+function clone(object){
+	function F(){}
+	F.prototype = object;
+	return new F;
+}
+function clone(obj){
+	var target = {};
+	for(var i in obj){
+		obj.hasOwnProperty(i) && (target[i] = obj[i]);
+	}
+	return target;
+}
+var cloneObje = Object.clone(oldObj);
+var cloneObj = JSON.parse(JSON.stringify(oldObj));
+
+//jQuery clone function
+var jQcloneObj = function(){
+	var target = arguments[0] || {}, i = 1, len = arguments.length, 
+		deep = false, options, name, src, copy,
+		toString = Object.prototype.toString;
+
+	if(typeof target === 'boolean'){
+		deep = target;
+		target = arguments[1] || {};
+		i = 2;
+	}
+
+	//Object.prototype.toString.call(target).slice(8, -1) !== 'Function'
+	if(typeof target !== 'object' && toString.call(target) !== '[object Function]'){
+		target = {};
+	}
+
+	// Handle case when target is a string or something (possible in deep copy)
+	if(len === i){
+		target = this;
+		--i;
+	}
+
+	for(; i < len; i++){
+		// Only deal with non-null/undefined values
+		if((options = arguments[i]) != null){
+			for(name in options){
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if(target === copy){continue;}
+
+				// Recurse if we're merging object literal values or arrays
+				if(deep && copy && (toString.call(copy) !== 'Object' || toString.call(copy) !== 'Array')){
+					var clone = src && (toString.call(src) !== 'Object' || toString.call(src) !== 'Array') ? src :
+							(toString.call(copy) !== 'Array'	? [] : {});
+
+					// Never move original objects, clone them
+					target[name] = jQcloneObj(deep, clone, copy);
+				}else if(copy !== undefined){
+					target[name] = copy;
+				}
+			}
+		}
+	}
+	return target;
+};
+
+//////////////////   序列化对象   ///////////////////
+function serialize(obj){
+    var output = [], toString = Object.prototype.toString;
+
+    for(var key in obj){
+        if(toString.call(obj[key]).slice(8, -1) === 'Object' || toString.call(obj[key]).slice(8, -1) === 'Array'){
+            output.push(serialize(obj[key]));
+        }else{
+        	if(toString.call(obj[key]).slice(8, -1) === 'Function'){
+        		obj.hasOwnProperty(key) && output.push(key + ': ' + obj[key]);
+        	}else{
+        		obj.hasOwnProperty(key) && output.push(key + '": "' + obj[key]);
+        	}            
+        }                    
+    }
+
+    return output.join('", "');
+}
+
+function augment(receivingClass, givingClass){
+	if(arguments[2]){
+		for(var i = 2, len = arguments.length; i++){
+			receivingClass.prototype[arguments[i]] || (receivingClass.prototype[arguments[i]] = givingClass.prototype[arguments[i]]);
+		}
+	}else{
+		for(methodName in givingClass.prototype){
+			receivingClass.prototype[methodName] || (receivingClass.prototype[methodName] = givingClass.prototype[methodName]);
+		}
+	}
+}
+
+///////////////////////  就地编辑域  //////////////////////////
+function EditInPlaceField(id, parent, value){
+	this.id = id;
+	this.parentElement = parent;
+	this.value = value || 'default';
+
+	this.createElements(this.id);
+	this.attachEvents();
+}
+
+EditInPlaceField.prototype = {
+	createElements: function(id){
+		var create = function(ele){
+			return document.createElement(ele);
+		};
+		this.containerElement = create('div');
+		this.parentElement.appendChild(this.containerElement);
+
+		var c = this.containerElement;
+		this.staticElement = create('span');
+		c.appendChild(this.staticElement);
+		this.staticElement.innerHTML = this.value;
+
+		this.fieldEle = create('input');
+		this.fieldEle.type = 'text';
+		this.fieldEle.value = this.value;
+		c.appendChild(this.fieldEle);
+
+		this.saveBtn = create('input');
+		this.saveBtn.type = 'button';
+		this.saveBtn.value = 'Save';
+		c.appendChild(this.saveBtn);
+
+		this.cancelBtn = create('input');
+		this.cancelBtn.type = 'button';
+		this.cancelBtn.text = 'Cancel';
+		c.appendChild(this.cancelBtn);
+
+		this.convertToText();
+	},
+
+	attachEvents: function(){
+		var self = this;
+		addEvent(this.staticElement, 'click', function(){
+			self.convertToEditable();
+		});
+		addEvent(this.saveBtn, 'click', function(){
+			self.save();
+		});
+		addEvent(this.cancelBtn, 'click', function(){
+			self.cancel();
+		});
+	},
+
+	convertToEditable: function(){
+		this.staticElement.style.display = 'none';
+		this.fieldEle.style.display = 'inline';
+		this.saveBtn.style.display = 'inline';
+		this.cancel.style.display = 'inline';
+
+		this.setValue(this.value);
+	},
+
+	save: function(){
+		this.value = this.getValue();
+		var self = this;
+		var callback = {
+			success: function(){self.convertToText();},
+			failure: function(){alert('Error saving value.');}
+		};
+		ajaxRequest('GET', 'save.php?id=' + encodeURIComponent(this.id) + '&value=' + encodeURIComponent(this.value), callback);
+	},
+
+	cancel: function(){
+		this.convertToText();
+	},
+
+	convertToText: function(){
+		this.fieldEle.style.display = 'none';
+		this.saveBtn.style.display = 'none';
+		this.cancel.style.display = 'none';
+		this.staticElement.style.display = 'inline';
+
+		this.setValue(this.value);
+	},
+
+	setValue: function(value){
+		this.fieldEle.value = value;
+		this.staticElement.innerHTML = value;
+	},
+
+	getValue: function(){
+		return this.fieldEle.value;
+	}
+};
+
+
+/////////////////////// 单体模式的分支 //////////////////////////
+/*创建XHR单体模式*/
+var simpleXHRFactory = (function(){
+	var standard = {
+		createXHRObjec: function(){
+			return new XMLHttpRequest();
+		}
+	};
+	var activeXNew = {
+		createXHRObjec: function(){
+			return new ActiveXObject('Msxml2.XMLHTTP');
+		}
+	};
+	var activeXOld = {
+		createXHRObjec: function(){
+			return new ActiveXObject('Msxml2.XMLHttp');
+		}
+	};
+
+	var testObject;
+	try{
+		testObject = standard.createXHRObjec();
+		return standard;
+	}catch(ex){
+		try{
+			testObject = activeXNew.createXHRObjec();
+			return activeXNew;
+		}catch(ex){
+			try{
+				testObject = activeXOld.createXHRObjec();
+				return activeXOld;
+			}catch(ex){
+				throw new Error('No XHR object found in this environment.');
+			}
+		}
+	}
+})();
+
+/*---------------------------------------------------------------------*/
+/*                         Start  【Molt框架原型】                     */
+/*---------------------------------------------------------------------*/
+
+/*** 链式写法 ***/
+Function.prototype.method = function(name, fn){
+	this.prototype[name] = fn;
+	return this;
+};
+
+(function(){
+	function _m$(els){
+		this.elements = [];
+		for(var i = 0, len = els.length; i < len; ++i){
+			var element = els[i];
+			if(Object.prototype.toString.call(element).slice(8, -1) === 'String'){
+				if(element.indexOf('#') > -1){
+					element = document.getElementById(element);
+				}else if(element.indexOf('.') > -1){
+					if(document.getElementsByClassName != undefined){
+						this.elements = document.getElementsByClassName(element);
+						return;
+					}
+				}else{
+					this.elements = document.getElementsByTagName(element);
+					return;
+				}
+			}
+			this.elements.push(element);		//可以传入window对象
+		}
+	}
+	//公共方法
+	//1、each		2、
+	_m$.method('each', function(fn){
+			for(var i = 0, len = this.elements.length; i < len; ++i){
+				fn.call(this, this.elements[i]);
+			}
+			return this;
+		});
+
+	//CSS操作
+	//1、设置样式		2、隐藏			3、块化			4、获取样式
+	_m$.method('setStyle', function(prop, val){
+			this.each(function(el){
+				el.style[prop] = val;
+			});
+			return this;
+		}).method('hidden', function(){
+			var that = this;
+			this.each(function(el){
+				that.setStyle('display', 'none');
+			});
+			return this;
+		}).method('show', function(){
+			var that = this;
+			this.each(function(el){
+				that.setStyle('display', 'block');
+			});
+			return this;
+		}).method('getStyle', function(prop, callback){		//不用回调函数
+			this.each(function(el){
+				if(window.getComputedStyle){
+					callback(window.getComputedStyle(prop));
+				}else if(el.currentStyle){
+					callback(el.currentStyle[prop]);
+				}
+			});	
+			return this;		
+		});
+
+	//事件操作
+	//1、添加事件		2、移除事件
+	_m$.method('addEvent', function(type, fn){
+			var add = function(el){
+				if(window.addEventListener){
+					el.addEventListener(type, fn, false);
+				}else if(window.attachEvent){
+					el.attachEvent('on' + type, fn);
+				}else{
+					el['on' + type] = fn;
+				}
+			};
+			this.each(function(el){
+				add(el);
+			});
+			return this;
+		}).method('removeEvent', function(type, fn){
+			var remove = function(el){
+				if(window.removeEventListener){
+					el.removeEventListener(type, fn, false);
+				}else if(window.detachEvent){
+					el.detachEvent('on' + type, fn);
+				}else{
+					el['on' + type] = null;
+				}
+			};
+			this.each(function(el){
+				remove(el);
+			});
+			return this;
+		})；
+	//DOM操作
+	//1、添加class	 	2、移除class		3、替换class		4、是否有class
+	_m$.method('addClass', function(class){
+		this.each(function(el){
+			var n = el.className;
+			el.className = n ? n + ' ' + class : class;
+		});	
+		return this;
+	}).method('removeClass', function(class){
+		this.each(function(el){
+			var arr = el.className.split(' ');
+			for(var i = 0, len = arr.length; i < len; i++){
+				if(arr[i] == class){arr.splice(i, 1);}
+			}
+			el.className = arr.join(' ');
+		});	
+		return this;
+	}).method('replaceClass', function(class, newClass){
+		this.each(function(el){
+			var arr = el.className.split(' ');
+			for(var i = 0, len = arr.length; i < len; i++){
+				if(arr[i] == class){arr.splice(i, 1, newClass);}
+			}
+			el.className = arr.join(' ');
+		});
+		return this;
+	}).method('hasClass', function(class){				//有返回值，用回调函数
+		this.each(function(el, callback){
+			var arr = el.className.split(' ');
+			for(var i = 0, len = arr.length; i < len; i++){
+				if(arr[i] == class){callback.call(this, true);}
+			}
+			callback.call(this, false);			
+		});
+		return this;
+	});
+
+	//ajax操作
+	//1、	2、3、
+
+
+	window.installHelper = function(scope, interface){
+		scope[interface] = function(){
+			return new _m$(arguments);
+		};
+	};
+
+
+
+
+	/********************** 非链式写法 ***********************/
+	_m$.prototype = {
+		each: function(fn){
+			for(var i = 0, len = this.elements.length; i < len; ++i){
+				fn.call(this, this.elements[i]);
+			}
+			return this;
+		},
+		setStyle: function(prop, val){
+			this.each(function(el){
+				el.style[prop] = val;
+			});
+			return this;
+		},
+		show: function(){
+			var that = this;
+			this.each(function(el){
+				that.setStyle('display', 'block');
+			});
+			return this;
+		},
+		addEvent: function(type, fn){
+			var add = function(el){
+				if(window.addEventListener){
+					el.addEventListener(type, fn, false);
+				}else if(window.attachEvent){
+					el.attachEvent('on' + type, fn);
+				}
+			};
+			this.each(function(el){
+				add(el);
+			});
+			return this;
+		}
+	};
+
+	window.m$ = function(){
+		return new _m$(arguments);
+	};
+})();
+
+/*---------------------------------------------------------------------*/
+/*                         End  【Molt框架原型】                       */
+/*---------------------------------------------------------------------*/
