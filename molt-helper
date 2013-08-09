@@ -46,6 +46,27 @@ Array.prototype.remove = function(from, to){
 	return this.push.apply(this, temps);  //将后半部分推入数组
 }
 
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+
+Array.prototype.remove = function(){
+    var a = arguments, l = a.length, i;
+    if(!l){
+	for(var j = 0; j < l; j ++){
+	    i = this.indexOf(a[j]);
+	    this.splice(i, 1);
+	}
+    }    	
+};
+
 /* ######################  兼容IE5写原生方法push和shift  ###################### */
 function Array_push() {
 	var A_p = 0;
