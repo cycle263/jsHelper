@@ -17,6 +17,7 @@ function delObjArr(arrs,k,v){
         if(arrs[i][k] == v){
             console.log('index: ' + i + ', value: ' + arrs[i][k]);
             arrs.splice(i, 1);
+            return；
         }
     }
 }
