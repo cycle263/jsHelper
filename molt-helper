@@ -23,6 +23,16 @@ function delObjArr(arrs,k,v，o){     //o为是否进行删除的开关
     }
 }
 
+function IndexOfObject(arr, filed, value){
+    var i = 0, l = arr ? arr.length : 0;
+    for(;i < l; i++){
+        if(arr[i][filed] == value){
+            return i;
+        }
+        return -1;
+    }
+}
+
 
 /* ######################  string与DOM tree之间的相互转换  ###################### */
 var convertDOM = {
