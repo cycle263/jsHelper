@@ -11,6 +11,20 @@ var print = function(obj){
 	return str;
 }
 
+/*********************** 阻止键盘默认事件 ***********************/
+app.directive('verifyinput', function(){
+    return function(scope, ele, attrs) {
+        ele.bind('keypress', function(event) {
+            var charCode = typeof event.charCode == 'number' ? event.charCode : event.keyCode;            
+            if (!/[\w]/.test(String.fromCharCode(charCode)) && event.keyCode != 8 && event.keyCode != 32 && event.keyCode != 45 && !(event.shiftKey && event.keyCode >= 65 && event.keyCode <= 90) || (event.shiftKey && event.keyCode == 95)) {
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+            }
+        });
+    };
+});
+//组合键中keyCode值与单独的keyCode有一定出入
+
+
 /*******知数组中某个对象的属性值，删除数组中的该对象******/
 function delObjArr(arrs,k,v，o){     //o为是否进行删除的开关
     o ? o : false;
