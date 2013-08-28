@@ -227,6 +227,15 @@ function addQueryStringArg(url, name, value){
 	return url;
 }
 
+//序列化body ——> formEncoded
+function paramForms(obj){
+            var result = '';
+            for(var i in obj){
+                result += encodeURIComponent(i) + "=" + encodeURIComponent(obj[i]) + "&";
+            }
+            return result.substr(0,result.length-1).replace(/%20/g, '+');
+        }
+
 /* #############################  记录错误日志，以URL查询字符串方式，用image对象的src属性传递  ############################ */
 function logError(sev, msg){
 	var img = new Image();
