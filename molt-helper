@@ -47,6 +47,15 @@ function IndexOfObject(arr, filed, value){
     }
 }
 
+/******************* 转换日期格式 ********************/
+function transformDateFormat(date){
+        var m = (date.getMonth() + 1).toString(),
+        d = date.getDate().toString();
+
+        date = date.getFullYear() + '-' + (m[1] ? m : '0' + m) + '-' + (d[1] ? d : '0' + d);
+	return date;
+}
+
 
 /* ######################  string与DOM tree之间的相互转换  ###################### */
 var convertDOM = {
