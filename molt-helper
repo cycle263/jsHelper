@@ -11,6 +11,20 @@ var print = function(obj){
 	return str;
 }
 
+/***************** 比对外链样式表名称 *******************/
+function compareStyleName(styleName){
+    if(!document.styleSheets){return;}
+    var sheets = document.styleSheets, hasResult = false;
+    
+    for(var i = 0, l = sheets.length; i < l; i++){
+        var name = sheets[i].href.substring(sheets[i].href.lastIndexOf('/') + 1);
+        if(styleName == name){
+            hasResult = true;	//存在此style，返回true
+        }
+    }
+    return hasResult;
+}
+
 /*********************** 阻止键盘默认事件 ***********************/
 app.directive('verifyinput', function(){
     return function(scope, ele, attrs) {
