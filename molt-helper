@@ -99,6 +99,29 @@ var convertArray = function(list){
 	return Array.prototype.slice.call(list);
 };
 
+
+/*************** JSON转换CSV及example **************/
+function jsonToCSV(json, isFirst, isLast){
+    var result = '';
+    for(var item in json){
+        if(isFirst){
+            result += "'" + item + "',";
+
+        }else{
+            result += "'" + json[item] + "',";
+        }
+    }
+    result = result.substring(0, result.lastIndexOf(','));
+    console.log(isLast);
+    return isLast ? result : result + '\n';
+}
+var obj = {name:'cycle',job:'dev',dep:'GSDT',region:'CD'}, str = '';
+var arr = [{name:'cycle',job:'dev',dep:'GSDT',region:'CD'},{name:'cycle',job:'dev',dep:'GSDT',region:'CD'},{name:'cycle',job:'dev',dep:'GSDT',region:'CD'},{name:'cycle',job:'dev',dep:'GSDT',region:'CD'}];
+for(var i = 0, l = arr.length;i < l;i++){
+    str += jsonToCSV(arr[i], i==0, i==arr.length - 1); 
+}
+
+
 /* ######################  重写Array原生对象prototype方法remove  ###################### */
 Array.prototype.remove = function(from, to){
 	var temps = this.slice(parseInt(to || from) + 1 || this.length);  //截取删除后的后半部分
