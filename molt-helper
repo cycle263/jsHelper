@@ -105,12 +105,12 @@ var convertArray = function(list){
         var result = '';
         if(isFirst){
             for(var item in json){
-                result += "'" + item + "',";
+                result += '"' + item + '",';
             }
             result = result.substring(0, result.lastIndexOf(',')) + '\n';
         }
         for (var item in json) {
-            result += "'" + json[item] + "',";            
+            result += '"' + json[item] + '",';            
         }
         result = result.substring(0, result.lastIndexOf(','));
         return isLast ? result : result + '\n';
