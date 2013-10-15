@@ -25,6 +25,15 @@ function compareStyleName(styleName){
     return hasResult;
 }
 
+//日期格式转换
+var transformDateFormat = function(date) {
+    var m = (date.getMonth() + 1).toString(),
+        d = date.getDate().toString();
+
+    date = date.getFullYear() + '-' + (m[1] ? m : '0' + m) + '-' + (d[1] ? d : '0' + d);
+    return date;
+}
+
 /*********************** 阻止键盘默认事件 ***********************/
 app.directive('verifyinput', function(){
     return function(scope, ele, attrs) {
