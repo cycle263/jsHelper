@@ -83,6 +83,7 @@ function delObjArr(arrs,k,v，o){     //o为是否进行删除的开关
     }
 }
 
+//计算某字段属性在数组中的index
 function IndexOfObject(arr, filed, value){
     var i = 0, l = arr ? arr.length : 0;
     for(;i < l; i++){
