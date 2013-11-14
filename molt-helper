@@ -11,6 +11,29 @@ var print = function(obj){
 	return str;
 }
 
+//计算对象的长度
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+//判断对象是否存在于数组之中
+function deepArrayCompare(arr, obj){
+        var result = false;
+        var o = JSON.stringify(obj);
+
+        for(var i = 0, l = arr.length; i < l; i++){
+            var o1 = JSON.stringify(arr[i]);
+            if(o == o1){
+                result = true;
+            }
+        }
+        return result;
+    };
+
 /***************** 比对外链样式表名称 *******************/
 function compareStyleName(styleName){
     if(!document.styleSheets){return;}
