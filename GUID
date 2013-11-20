@@ -153,3 +153,29 @@
     var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
     return v.toString(16);
 });
+
+
+//另外一种简洁的方式
+(function() {
+  // The object literal used to keep track of all of the generated
+  // IDs.
+  var used = {};
+   
+  // The globally visible function which is used to generate
+  // UUID that are unique for the remainder of the page session.
+  getUUID = function(id) {
+    for(;used[id = randomHex(8) + "-" + randomHex(4) + "-"
+              + randomHex(4) + "-" + randomHex(4) + randomHex(8)];){}
+    used[id] = 1;
+    return id;
+  };
+   
+  // Used to generate a hex number which is padded by zeros to
+  // display the specified amount of digits.  The param passed
+  // probably shouldn't be more than 8.
+  function randomHex(len) {
+    return (new Array(len).join(0)
+            + parseInt(Math.pow(2, len * 4) * Math.random()
+                      ).toString(16)).slice(-len);
+  }
+})();
