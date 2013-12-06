@@ -1541,6 +1541,12 @@ var jQcloneObj = function(){
 	return target;
 };
 
+///简易的克隆对象
+function cloneSimapleObject(obj){
+	var temp = JSON.stringify(obj);
+	return JSON.parse(temp);
+}
+
 //////////////////   序列化对象   ///////////////////
 function serialize(obj){
     var output = [], toString = Object.prototype.toString;
