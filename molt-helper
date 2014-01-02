@@ -261,7 +261,7 @@ var docCookies = {
                 case String:
                     sExpires = "; expires=" + vEnd;
                     break;
-                case Date:
+                case Date:  //兼容性较好，IE下面兼容
                     sExpires = "; expires=" + vEnd.toUTCString();
                     break;
             }
