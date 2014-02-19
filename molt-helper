@@ -1,3 +1,4 @@
+//收藏网页
 function AddFavorite(sURL, sTitle) { 
     try { 
         window.external.addFavorite(sURL, sTitle) 
@@ -10,6 +11,7 @@ function AddFavorite(sURL, sTitle) {
     } 
 } 
 
+//设置为主页
 function setHomepage() { 
     if (document.all) { 
         document.body.style.behavior = 'url(#default#homepage)'; 
@@ -26,6 +28,16 @@ function setHomepage() {
         prefs.setCharPref('browser.startup.homepage', 'http://www.jq-school.com') 
     } 
 } 
+
+//添加input元素
+function addInputEle(){
+	var mainForm = document.forms[0];
+	var newInput = document.createElement('input');
+	newInput.type = 'hidden';
+	newInput.value = '';
+	newInput.name = '';
+	mainForm.appendChild(newInput);
+}
 
 /* ######################  function output object遍历对象内容  ###################### */
 var print = function(obj){
