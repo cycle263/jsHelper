@@ -42,10 +42,8 @@ function addInputEle(){
 //添加select元素
 function addSelectEle(divEle){
 	var select = document.createElement('input');
-	var option = document.createELement('opiton');
-	option.text = "text";
-	option.value = "value";
-	select.options.add(option);
+	var option = new Option('text', 'value');  //兼容性好于createElement
+	select.options[0] = option;  //兼容性好于options.add()
 	divEle.appendChild(select);
 }
 
