@@ -39,6 +39,16 @@ function addInputEle(){
 	mainForm.appendChild(newInput);
 }
 
+//添加select元素
+function addSelectEle(divEle){
+	var select = document.createElement('input');
+	var option = document.createELement('opiton');
+	option.text = "text";
+	option.value = "value";
+	select.options.add(option);
+	divEle.appendChild(select);
+}
+
 /* ######################  function output object遍历对象内容  ###################### */
 var print = function(obj){
   var str = "";
