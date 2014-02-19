@@ -1,3 +1,62 @@
+/* #############################  获取元素框的坐标  ############################ */
+var coord = {
+	getX: function(element){
+		var actualLeft = element.offsetLeft;
+			var current = element.offsetParent;
+			while (current !== null){
+				actualLeft += current.offsetLeft;
+				current = current.offsetParent;
+			}
+			return actualLeft;
+	},
+	getY: function(element){
+			var actualTop = element.offsetTop;
+			var current = element.offsetParent;
+			while (current !== null){
+				actualTop += current.offsetTop;
+				current = current.offsetParent;
+			}
+			return actualTop;
+	},
+};
+
+function getRectCoord(ele){
+	var scrollTop = document.documentElement.scrollTop;
+	var scrollLeft = document.documentElement.scrollLeft;
+	if(ele.getBoundingClientRect){
+		if(typeof arguments.callee.offset != "number"){
+			var temp = document.createElement("div");
+			temp.style.cssText = "positon:absolute;left:0;top:0;";
+			document.body.appendChild(temp);
+			arguments.callee.offset = -temp.getBoundingClientRect().top - scrollTop;
+			document.body.removeChild(temp);
+			temp = null;
+		}
+
+		var rect = element.getBoundingClientRect();
+		var offset = arguments.callee.offset;
+
+		return{
+			left: rect.left + offset,
+			right: rect.right + offset,
+			top: rect.top + offset,
+			bottom: rect.bottom + offset
+		};
+	}else{
+		var actualLeft = getElementLeft(ele);
+		var actualTop = getElementTop(ele);
+
+		return{
+			left: actualLeft - scrollLeft,
+			right: actualLeft - scrollLeft + ele.offsetWidth,
+			top: actualTop- scrollTop,
+			bottom: actualTop - scrollTop + ele.offsetHeigth
+		}
+	}
+}
+
+
+
 
 /*---------------------------------------------------------------------*/
 /*                         Start  【Tween公式】                           */
