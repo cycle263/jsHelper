@@ -47,6 +47,34 @@ function addSelectEle(divEle){
 	divEle.appendChild(select);
 }
 
+//转换日期格式（自定义）
+function dateString(date, str){
+    var year = date.getFullYear(),
+        month = date.getMonth() + 1,
+        fillMonth = month < 10 ? '0' + month : month,
+        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        monthName = months[month-1],
+        day = date.getDate(),
+        fillDay = day < 10 ? '0' + day : day,
+        weekDay = date.getDay(),
+        weeks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        weekName = weeks[weekDay];
+    
+    str = str.replace(/%Y/g, year);
+    str = str.replace(/%y/g, year.toString().slice(-2));
+    str = str.replace(/%M/g, monthName);
+    str = str.replace(/%m/g, monthName.slice(0, 3));
+    str = str.replace(/%N/g, fillMonth);
+    str = str.replace(/%W/g, weekName);
+    str = str.replace(/%w/g, weekName.slice(0, 3));
+    str = str.replace(/%D/g, fillDay);
+    str = str.replace(/%d/g, day);
+    return str;
+}
+
+dateString(new Date(), '%Y/%N/%D %W');
+
+
 /* ######################  function output object遍历对象内容  ###################### */
 var print = function(obj){
   var str = "";
