@@ -16,4 +16,8 @@ very useful！！
 
 4、m$微型框架实现
 
-5、MD5、GUID等功能模块
+5、base64、GUID等功能模块
+
+6、javascript的对象模型
+
+7、浏览器的兼容及其属性
