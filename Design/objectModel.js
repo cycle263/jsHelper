@@ -96,6 +96,7 @@ var Book = function(newIsbn, newTitle, newAuthor){ //implements publication
   };
   
   //...
+  this.setIsbn(newIsbn);
 };
 
 Book.prototype.display = function(){
