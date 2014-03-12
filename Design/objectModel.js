@@ -12,8 +12,8 @@ Book.prototype = {
     if(isbn === undefined || typeof isbn !== 'string'){
       return false;
     }
-    isbn = isbn.replace(/-/, ''); //remove dashes.
-    if(isbn.length !== 10 || isbn.length !== 13){
+    isbn = isbn.replace(/-/g, ''); //remove dashes.
+    if(isbn.length !== 10 && isbn.length !== 13){
       return false;
     }
     
