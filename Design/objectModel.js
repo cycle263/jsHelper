@@ -80,17 +80,17 @@ Book.prototype = {
 //闭包私有模型
 var Book = function(newIsbn, newTitle, newAuthor){ //implements publication
   //private attributes
-  var _isbn, _title, _author
+  var _isbn, _title, _author, self = {};
   
   //private method
   function _checkIsbn(isbn){/*..*/}
   
   //privileged method
-  this.getIsbn = function(){
+  self.getIsbn = function(){
     return _isbn;
   };
   
-  this.setIsbn = function(newIsbn){
+  var _setIsbn = function(newIsbn){
     if(!_checkIsbn(newIsbn)) throw new Error("Book: Invalid ISBN.");
     _isbn = newIsbn;
   };
@@ -98,7 +98,9 @@ var Book = function(newIsbn, newTitle, newAuthor){ //implements publication
   //...
   
   //Constructor code
-  this.setIsbn(newIsbn);
+  _setIsbn(newIsbn);
+  
+  return self;
 };
 
 //Public, non-privileged method
