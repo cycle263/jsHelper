@@ -96,9 +96,12 @@ var Book = function(newIsbn, newTitle, newAuthor){ //implements publication
   };
   
   //...
+  
+  //Constructor code
   this.setIsbn(newIsbn);
 };
 
+//Public, non-privileged method
 Book.prototype.display = function(){
   //...
 };
