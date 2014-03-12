@@ -35,3 +35,44 @@ Book.prototype = {
     return true;
   }
 };
+
+//私有变量模型
+var Book = function(isbn, title, author){
+  if(!this.checkIsbn(isbn)) throw new Error("Book: Invalid ISBN.");
+  this._isbn = isbn;
+  this._title = title || "No title specified";
+  this._author = author || "No author specified";
+};
+
+Book.prototype = {/*...*/};
+
+//闭包私有模型
+var Book = function(isbn, title, author){
+  this.setIsbn(isbn);
+  this.setTitle(title);
+  this.setAuthor(author);
+};
+
+Book.prototype = {
+  _checkIsbn: function(isbn){/*...*/},
+  getIsbn: function(){
+    return this._isbn;
+  },
+  setIsbn: function(isbn){
+    if(!this._checkIsbn(isbn)) throw new Error("Book: Invalid ISBN.");
+    this._isbn = isbn;
+  },
+  getTitle: function(){
+    return this._title;
+  },
+  setTitle: function(){
+    this._title = title || "No author specified";
+  },
+  getAuthor: function(){
+    return this._author;
+  },
+  setAuthor: function(){
+    this._author = author || "No author specified"
+  },
+  display: function(){}
+}
