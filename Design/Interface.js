@@ -52,3 +52,6 @@ Interface.ensureImplements = function(object){
     }
   }
 };
+
+//demo
+var Publication = new Interface('Publication', ['getIsbn', 'setIsbn', 'getTitle', 'setTitle', 'getAuthor', 'setAuthor', 'display']);
