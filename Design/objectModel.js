@@ -36,7 +36,7 @@ Book.prototype = {
   }
 };
 
-//私有变量模型
+//私有变量模型1
 var Book = function(isbn, title, author){
   if(!this.checkIsbn(isbn)) throw new Error("Book: Invalid ISBN.");
   this._isbn = isbn;
@@ -46,7 +46,7 @@ var Book = function(isbn, title, author){
 
 Book.prototype = {/*...*/};
 
-//闭包私有模型
+//私有变量模型2 --- 规范化
 var Book = function(isbn, title, author){
   this.setIsbn(isbn);
   this.setTitle(title);
@@ -75,4 +75,29 @@ Book.prototype = {
     this._author = author || "No author specified"
   },
   display: function(){}
-}
+};
+
+//闭包私有模型
+var Book = function(newIsbn, newTitle, newAuthor){ //implements publication
+  //private attributes
+  var _isbn, _title, _author
+  
+  //private method
+  function _checkIsbn(isbn){/*..*/}
+  
+  //privileged method
+  this.getIsbn = function(){
+    return _isbn;
+  };
+  
+  this.setIsbn = function(newIsbn){
+    if(!_checkIsbn(newIsbn)) throw new Error("Book: Invalid ISBN.");
+    _isbn = newIsbn;
+  };
+  
+  //...
+};
+
+Book.prototype.display = function(){
+  //...
+};
