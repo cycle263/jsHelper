@@ -107,3 +107,42 @@ var Book = function(newIsbn, newTitle, newAuthor){ //implements publication
 Book.prototype.display = function(){
   //...
 };
+
+//闭包模型二
+var Book = (function(){
+  //private static attributes
+  var numOfBooks = 0;
+  
+  function checkIsbn(isbn){/*...*/}
+  
+  return function(isbn, title, author){
+    var _isbn, _title, _author;
+    
+    this.getIsbn = function(){
+      return _isbn;
+    };
+    this.setIsbn = function(isbn){
+      if(!checkIsbn(isbn)) throw new Error("Book: Invalid ISBN.");
+      _isbn = isbn;
+    };
+    
+    //...
+    
+    numOfBooks++;
+    if(numOfBooks > 50)
+      throw new Error('Book: Only 50 instances of Book can be created.');
+        
+    this.setIsbn(isbn);
+    //...
+  };
+})();
+
+//public static method
+Book.convertToTitleCase = function(inStr){
+  //...
+};
+
+//Public, non-privileged methods
+Book.prototype.display = function(){
+  //
+};
