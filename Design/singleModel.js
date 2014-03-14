@@ -37,6 +37,8 @@ NeweggCorp.RegPage = {
   }
 };
 
+addLoadEvent(NeweggCorp.RegPage.init);
+
 //方式一
 NeweggCorp.DataParser = {
   //Private method
@@ -84,4 +86,29 @@ NeweggCorp.DataParser = (function(){
 	};
 })(); //Invoke the function and assign the returned object literal to NeweggCorp.DataParser
 
-addLoadEvent(NeweggCorp.RegPage.init);
+//惰性加载方式三
+MyNamespace.Singleton = (function(){
+	var uniqueInstance; //Private attribute that holds the single instance
+	
+	function constructor(){ //All of the normal singleton code goes here
+		var privateAttribute = false;
+		
+		function privateMethod(){
+			//...
+		}
+		
+		return {
+			publicAttribute: true,
+			publicMethod: function(){}
+		};
+	}
+	
+	return {
+		getInstance: function(){
+			if(!uniqueInstance){ //Instantiate only if the instance doesn't exist
+				uniqueInstance = constructor();
+			}
+			return uniqueInstance;
+		}	
+	};
+})();
