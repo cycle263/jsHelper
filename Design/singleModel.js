@@ -37,6 +37,7 @@ NeweggCorp.RegPage = {
   }
 };
 
+//方式一
 NeweggCorp.DataParser = {
   //Private method
   _stripWhitespace: function(str){
@@ -55,5 +56,10 @@ NeweggCorp.DataParser = {
     return outputArray;
   }
 };
+
+//方式二
+NeweggCorp.DataParser = (function(){
+
+});
 
 addLoadEvent(NeweggCorp.RegPage.init);
