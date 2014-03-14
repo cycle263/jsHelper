@@ -99,7 +99,9 @@ MyNamespace.Singleton = (function(){
 		
 		return {
 			publicAttribute: true,
-			publicMethod: function(){}
+			publicMethod: function(){
+				//...
+			}
 		};
 	}
 	
