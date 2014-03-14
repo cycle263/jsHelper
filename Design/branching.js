@@ -1,0 +1,3 @@
+MyNamespace.Singleton = (function(){
+
+})();
