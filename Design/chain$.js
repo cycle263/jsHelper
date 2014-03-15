@@ -12,6 +12,17 @@ function $(){
     return elements;
 }
 
+window.installHelper = function(scope, interface){
+    scope[interface] = function(){
+        return new _$(arguments);  
+    };  
+};
+
+//Define a namespace without overwriting it if it already exists.
+window.com = window.com || {};
+com.util = com.util || {};
+installHelper(com.util, 'get'); //demo
+
 //私有方法写法
 (function(){
     function _$(eles){
@@ -32,7 +43,7 @@ function $(){
             }  
             return this;
         },
-        getSytle: function(prop){
+        getSytle: function(prop){  //使用回调函数来获取数据，实现取值器的链式调用
             this.each(function(ele, fn){
                 fn.call(this, ele.style[prop]);
             });
