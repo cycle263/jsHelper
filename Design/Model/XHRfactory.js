@@ -37,3 +37,80 @@ SimpleHandler.prototype = {
         throw new Error('SimpleHandler: Could not create an XHR object');
     } //Factory method
 };
+
+
+/* QueuedHandler class */
+var QueuedHandler = function(){
+    this.queue = [];
+    this.reqInProgress = false;
+    this.retryDelay = 5;
+    this.retryTimes = 0;
+};
+extend(QueuedHandler, SimpleHandler);
+QueuedHandler.prototype.request = function(method, url, callback, postVars, override){
+    if(this.reqInProgress && !override){
+        this.queue.push({
+           method: method,
+           url: url,
+           callback: callback,
+           postVars: postVars
+        });
+    }else{
+        this.reqInProgress = true;
+        var xhr = this.createXHRObject();
+        var that = this;
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState !== 4) return;
+            if(xhr.status === 200){
+                callback.success(xhr.responseText, xhr.responseXML);
+                that.advanceQueue();
+            }else{
+                callback.failure(xhr.status);
+                if(that.retryTimes <=3){
+                    setTimeout(function(){
+                        that.request(method, url, callback, postVars, true);
+                        that.retryTimes++;
+                    }, that.retryDelay * 1000);
+                }else{
+                    that.retryTimes = 0;
+                }
+            }
+        };
+        xhr.open(method, url, true);
+        if(method !== 'POST') postVars = null;
+        xhr.send(postVars);
+    }
+};
+QueuedHandler.prototype.advanceQueue = function(){
+    if(this.queue.length === 0){
+        this.reqInProgress = false;
+        return;
+    }  
+    var req = this.queue.shift();
+    this.request(req.method, req.url, req.callback, req.postVars, true);
+};
+
+/* OfflineHandler class */
+var OfflineHandler = function(){
+    this.storedRequests = [];  
+};
+extend(OfflineHandler, SimpleHandler);
+OfflineHandler.prototype.request = function(method, url, callback, postVars){
+    if(XHRManager.ifOffline()){  //Store the requests until we are online
+        this.storeRequests.push({
+            method: method,
+            url: url,
+            callback: callback,
+            postVars: postVars
+        });
+    }else{
+        this.flushStoreRequests();
+        OfflineHandler.super.request(method, url, callback, postVars);
+    }
+};
+OfflineHandler.prototype.flushStoreRequests = function(){
+    for(var i = 0, l = this.storedRequests.length; i < l; i++){
+        var req = this.storedRequests[i];
+        OfflineHandler.super.request(req.method, req.url, req.callback, req.postVars);
+    }
+};
