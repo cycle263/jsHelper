@@ -163,6 +163,18 @@ var print = function(obj){
 		}
 	}
 	return str;
+};
+
+//getElementsByClassName compatibility  兼容IE6以上
+function getElementsByClassName(node, name){
+	var array = [];
+	var reg = new RegExp('(\s|^)' + name + '(\s|$)');
+	var all = node.getElementsByTagName('*');
+	for(var i = 0, l = all.length; i < l; i++){
+		if(reg.test(all[i].className))
+			array.push(all[i]);
+	}
+	return array;
 }
 
 //计算对象的长度
