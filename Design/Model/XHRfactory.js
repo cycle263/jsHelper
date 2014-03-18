@@ -3,7 +3,7 @@ var AjaxHandler = new Interface('AjaxHandler', ['request', 'createXHRObject']);
 
 /*  SimpleHandler class  */
 var SimpleHandler = function(){};  //implements AjaxHandler
-SimplerHandler.prototype = {
+SimpleHandler.prototype = {
     request: function(method, url, callback, postVars){
         var xhr = this.createXHRObject();
         xhr.onreadystatechange = function(){
