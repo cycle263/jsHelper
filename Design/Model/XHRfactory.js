@@ -24,13 +24,13 @@ SimpleHandler.prototype = {
         
         for(var i = 0, l = methods.lenght; i < l; i++){
             try{
-                method[i]();
+                methods[i]();
             }catch(e){
                 continue;
             }
             //If we reach this point, method[i] worked
-            this.createXHRObject = method[i]; //Memorize the method
-            return method[i];
+            this.createXHRObject = methods[i]; //Memorize the method
+            return methods[i];
         }
         
         //If we reach this point, none of the methods worked
