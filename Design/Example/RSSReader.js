@@ -58,7 +58,7 @@ FeedReader.prototype = {
         for(var i = 0, l = items.length; i < l; i++){
             var title =  items[i].getElementsByTagName('title')[0];
             var link = items[i].getElementsByTagName('link')[0];
-            this.display.append('<a href="' + link.firstChild.data + '"> + title.firstChild.data + '</a>');
+            this.display.append('<a href="' + link.firstChild.data + '">' + title.firstChild.data + '</a>');
         }
     },
     showError: function(status){
@@ -73,4 +73,18 @@ FeedReader.prototype = {
         var that = this;
         this.interval = setInterval(function(){that.fetchFeed();}, this.conf.updateInterval * 1000);
     }
+};
+
+/*  FeedManager namespace  */
+var FeedManager = {
+    createFeedReader: function(conf){
+        var displayModule = new ListDisplay(conf.id + '-display', conf.parent);
+        Interface.ensureImplements(displayModule, DisplayModule);
+        
+        var xhrHandler = XHRManager.createXHRHandler();
+        Interface.ensureImplements(xhrHandler, AjaxHandler);
+        
+        return new FeedReader(displayModule, xhrHandler, conf);
+    }
+};
 };
