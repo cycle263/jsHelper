@@ -1,6 +1,6 @@
 Javascript
 ==========
-Unit helper
+Unit helper function
 
 This is my project for javascript.
 
