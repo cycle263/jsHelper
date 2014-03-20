@@ -68,6 +68,11 @@ function queryStr(url, name){
     	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+//构建字符串最佳方式
+var arr = ['item 1', 'item 2', 'item 3', ...];  
+var list = '<ul><li>' + arr.join('</li><li>') + '</li></ul>';
+
+
 //Array forEach函数
 if (!Array.prototype.forEach)
 {
