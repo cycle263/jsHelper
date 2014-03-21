@@ -88,6 +88,24 @@ var list = '<ul><li>' + arr.join('</li><li>') + '</li></ul>';
 //生成随机码, 转换成2-36进制，然后截取8位
 Math.random().toString(36).substring(2, 10);
 
+//修改Function原型，运行时间，绑定上下文
+Function.prototype.runtime = function(){
+	var t1 = +new Date(),
+		run = this(),
+		t2 = +new Date();
+	return t2 - t1;  //单位是毫秒
+};
+
+//绑定特定的上下文，并返回此函数
+Function.prototype.bind = function(obj){
+	var fn = this,
+		slice = Array.prototype.slice,
+		args = slice.call(arguments, 1);
+	return function(){
+		return fn.apply(obj, args.concat(slice.apply(arguments)));
+	};
+};
+
 //Array forEach函数
 if (!Array.prototype.forEach)
 {
