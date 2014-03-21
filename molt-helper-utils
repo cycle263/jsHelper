@@ -60,6 +60,18 @@ function classof(o){
 	return Object.prototype.toString.call(o).slice(8, -1);
 }
 
+//用0补全位数，并返回字符串
+function prefixInteger(num, length) {
+    try{
+        if (num.toFixed().toString().length > length) {  //数值位数不能少于要求总位数
+            throw 'illegal number!';
+        }
+        return (num / Math.pow(10, length)).toFixed(length).substr(2);
+    }catch(err){
+        console.log(err);
+    }
+}
+
 //获取URL查询字符串query string
 function queryStr(url, name){
 	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -113,6 +125,17 @@ function unique(arr){
 	    }
 	}
 	return newArr;
+}
+
+//交换值方法, 不建议批量使用，批量使用交换函数
+var a = 9, b = 8;
+a = [b, b = a][0];
+
+//数组交换值函数
+function arrSwap(arr, x, y){
+	if(arguments.length < 3) throw new TypeError('Illegal parameters');
+	arr[x] = arr.splice(y, 1, arr[x])[0];
+	return arr;
 }
 
 //是否是素数函数
