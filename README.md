@@ -5,8 +5,7 @@ Unit helper function
 This is my project for javascript.
 
 例如 - 数组去重函数
-Examples
-=========
+##### Examples
 
 ```
 function unique(arr){
@@ -24,8 +23,7 @@ function unique(arr){
 }
 ```
 
-Include
-=========
+#### Include Features
 
 主要包括：
 
