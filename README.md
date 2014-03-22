@@ -4,7 +4,6 @@ Unit helper function
 
 This is my project for javascript.
 
-very useful！！
 
 主要包括：
 
@@ -23,4 +22,4 @@ very useful！！
 7、浏览器的兼容及其属性
 
 
-Google HTML/CSS Style Guide:http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
+Google HTML/CSS Style Guide: http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
