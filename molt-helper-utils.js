@@ -121,7 +121,7 @@ var currying = function(fn){
 };
 
 //反柯里化函数
-function uncurrying(){
+Function.prototype.uncurrying(){
 	var _this = this;
 	return function(){
 		return Function.prototype.call.apply(_this, arguments);
