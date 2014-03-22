@@ -106,6 +106,17 @@ Function.prototype.bind = function(obj){
 	};
 };
 
+var currying = function(fn){
+	var _args = [];
+	return function(){
+		if(arguments.length === 0){
+			return fn.apply(this, _args);
+		}
+		[].push.apply(_args, arguments);
+		return arguments.callee;
+	}
+};
+
 //Array forEach函数
 if (!Array.prototype.forEach)
 {
