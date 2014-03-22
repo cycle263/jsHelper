@@ -50,3 +50,8 @@ http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
 ###### Markdown语法说明
 
 http://wowubuntu.com/markdown
+
+
+### Contribution
+
+We'd love you to get involved in making the javascript.js library. If you'd like to contribute please get in touch, fork/clone the repo and have a dig around. Make pull requests on the dev branch.
