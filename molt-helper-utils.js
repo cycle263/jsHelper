@@ -108,6 +108,7 @@ Function.prototype.bind = function(obj){
 	};
 };
 
+//柯里化函数
 var currying = function(fn){
 	var _args = [];
 	return function(){
@@ -118,6 +119,14 @@ var currying = function(fn){
 		return arguments.callee;
 	}
 };
+
+//反柯里化函数
+function uncurrying(){
+	var _this = this;
+	return function(){
+		return Function.prototype.call.apply(_this, arguments);
+	};
+}
 
 //Array forEach函数
 if (!Array.prototype.forEach)
