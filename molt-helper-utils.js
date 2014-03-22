@@ -43,6 +43,7 @@ function intersection(o, p){
 	return restrict(extend({}, o), p);
 }
 
+//对象转换成数组类型
 function keys(o){
 	if(typeof o !== "object") throw TypeError();
 	var result = [];
