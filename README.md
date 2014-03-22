@@ -7,6 +7,7 @@ This is my project for javascript.
 例如 - 数组去重函数
 Examples
 =========
+
 ```
 function unique(arr){
 	var newArr = [],
@@ -22,6 +23,9 @@ function unique(arr){
 	return newArr;
 }
 ```
+
+Include
+=========
 
 主要包括：
 
