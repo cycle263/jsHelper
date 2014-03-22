@@ -6,18 +6,31 @@ This is my project for javascript.
 
 例如 - 数组去重函数
 function unique(arr){
+
 	var newArr = [],
+	
 	    hash = {};
+	    
 	for(var i = 0, l = arr.length; i < l; i++){
+	
 		var item = arr[i],
+		
 		    key = Object.prototype.toString.call(item).slice(8, -1) + JSON.stringify(item);
+		    
 	    if(hash[key] !== 1){
+	    
 	    	newArr.push(item);
+	    	
 	    	hash[key] = 1;
+	    	
 	    }
+	    
 	}
+	
 	return newArr;
+	
 }
+
 
 
 主要包括：
