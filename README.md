@@ -43,5 +43,6 @@ Include
 
 7、浏览器的兼容及其属性
 
-
+Other
+==========
 Google HTML/CSS Style Guide: http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
