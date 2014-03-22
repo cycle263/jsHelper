@@ -5,7 +5,7 @@ Unit helper function
 This is my project for javascript.
 
 例如 - 数组去重函数
-
+```
 function unique(arr){
 
 	var newArr = [],
@@ -31,7 +31,7 @@ function unique(arr){
 	return newArr;
 }
 
-
+```
 
 主要包括：
 
