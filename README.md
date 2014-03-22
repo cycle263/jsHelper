@@ -48,3 +48,7 @@ Other
 ###### Google HTML/CSS Style Guide: 
 
 http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
+
+###### Markdown语法说明
+
+http://wowubuntu.com/markdown
