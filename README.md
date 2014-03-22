@@ -45,4 +45,6 @@ Include
 
 Other
 ==========
-Google HTML/CSS Style Guide: http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
+## Google HTML/CSS Style Guide: 
+
+http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
