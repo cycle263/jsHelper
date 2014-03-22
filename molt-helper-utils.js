@@ -1,6 +1,6 @@
 /***************** 对象操作函数 *****************/
 
-/extend，将P中的可枚举的属性复制到O中，返回源对象
+//extend，将P中的可枚举的属性复制到O中，返回源对象
 function extend(o, p){
 	for(var prop in p){
 		o[prop] = o[prop];
@@ -96,6 +96,7 @@ Function.prototype.runtime = function(){
 	return t2 - t1;  //单位是毫秒
 };
 
+/*  柯里化 和 反柯里化  */
 //绑定特定的上下文，并返回此函数
 Function.prototype.bind = function(obj){
 	var fn = this,
