@@ -21,3 +21,6 @@ very useful！！
 6、javascript的对象模型
 
 7、浏览器的兼容及其属性
+
+
+Google HTML/CSS Style Guide:http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
