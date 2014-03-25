@@ -42,8 +42,9 @@ function unique(arr){
 * 浏览器的兼容及其属性
 
 
-#### What makes a good front end engineer?
-	A good front end engineer needs to be able to communicate effectively due to the parties involved with the job. At any given time, a front end engineer answers to at least four customers
+#### What makes a good front end engineer
+
+	A good front end engineer needs to be able to communicate effectively due to the parties involved with the job. At any given time, a front end engineer answers to at least four customers:
 
 	* Product Managers – these are the folks responsible for the direction of the application. They have a vision of what the application should offer to users and (hopefully) how to make money off of that model. Oftentimes, they will be pushing for more features.
  	* User Interface Designers – these are the people responsible for the visual design and interaction model of the application. Their concern is what will make sense to the user, consistency of interaction, and overall usability. They are most of asking for slicker user interfaces that can be challenging to create.
