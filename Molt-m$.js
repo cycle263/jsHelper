@@ -29,7 +29,7 @@
 	}
 	
 	//增加javascript原生方法
-	//1、增加函数方法method   2、3、4、5、
+	//1、增加函数方法method   2、扩展extend   3、4、5、
 	Function.prototype.method = function(name, fn){
   		this.prototype[name] = fn;
 		return this;
@@ -158,6 +158,9 @@
 	
 	//元素属性操作
 	//1、添加属性   2、3、4、
+
+	//缓存操作
+	//1、Cookie   2、Session   3、4、
 
 	//ajax操作
 	//1、	2、3、
