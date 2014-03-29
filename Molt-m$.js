@@ -1,12 +1,10 @@
 /*---------------------------------------------------------------------*/
-/*                         Start  【Molt框架原型】                     */
+/* ---------------------   Start   【Molt框架原型】 -----------------  */
+/* ---------------------   Time	   【2012.12】      -----------------  */
+/* ---------------------   Author  【Cycle】        -----------------  */
 /*---------------------------------------------------------------------*/
 
 /*** 链式写法 ***/
-Function.prototype.method = function(name, fn){
-  this.prototype[name] = fn;
-	return this;
-};
 
 (function(){
 	function _m$(els){
@@ -29,6 +27,14 @@ Function.prototype.method = function(name, fn){
 			this.elements.push(element);		//可以传入window对象
 		}
 	}
+	
+	//增加javascript原生方法
+	//1、增加函数方法method   2、3、4、5、
+	Function.prototype.method = function(name, fn){
+  		this.prototype[name] = fn;
+		return this;
+	};
+		
 	//公共方法
 	//1、each		2、
 	_m$.method('each', function(fn){
@@ -149,6 +155,9 @@ Function.prototype.method = function(name, fn){
 			} 			
 		});
 	});
+	
+	//元素属性操作
+	//1、添加属性   2、3、4、
 
 	//ajax操作
 	//1、	2、3、
