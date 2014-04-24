@@ -62,6 +62,11 @@ http://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
 http://wowubuntu.com/markdown
 
 
+###### Sublime3破解版下载链接
+
+http://517down.com/html/soft/8.html
+http://www.7edown.com/soft/down/soft_19917.html
+
 ### Contribution
 
 We'd love you to get involved in making the javascript.js library. If you'd like to contribute please get in touch, fork/clone the repo and have a dig around. Make pull requests on the dev branch.
