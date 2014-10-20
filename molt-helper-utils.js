@@ -87,6 +87,12 @@ function classof(o){
 	return Object.prototype.toString.call(o).slice(8, -1);
 }
 
+//小数转换成百分数
+function tranPercent(num, digit){
+	var v = Math.pow(10, parseInt(digit));
+	return Math.floor(num * (100 * v))/v;   //多加一个小括号（100 * v），避免精度丢失
+}
+
 //用0补全位数，并返回字符串
 function prefixInteger(num, length) {
     try{
