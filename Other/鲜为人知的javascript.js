@@ -27,3 +27,5 @@ function addCSSRule(sheet, selector, rules, index) {
 // Use it!
 addCSSRule(document.styleSheets[0], "header", "float: left");
 
+/* pointer-events */
+.disabled { pointer-events: none; }//禁止了这个元素上的任何JavaScript事件或回调函数, 等同于禁止这个元素
