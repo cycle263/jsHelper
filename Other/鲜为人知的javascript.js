@@ -26,3 +26,4 @@ function addCSSRule(sheet, selector, rules, index) {
 
 // Use it!
 addCSSRule(document.styleSheets[0], "header", "float: left");
+
