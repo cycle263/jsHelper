@@ -214,8 +214,9 @@ function getRandomColor(){
  *Method 2
  *简单实用
  */
-'#'+((255*255*255)*Math.random()|0).toString(16);
-'#'+(0xFFFFFF*Math.random()|0).toString(16);
+'#'+((255*255*255)*Math.random()|0).toString(16);	//缺点：不一定够六位十六进制数字
+'#'+(0xFFFFFF*Math.random()|0).toString(16);	//缺点：不一定够六位十六进制数字
+'#' + (((0xFFFFFF-0x100000)*Math.random()+0x100000)|0).toString(16);
 
 //交换值方法, 不建议批量使用，批量使用交换函数
 var a = 9, b = 8;
@@ -251,47 +252,6 @@ var downloadURL = function(url) {
     }
     iframe.src = url;
 };
-
-//收藏网页
-function AddFavorite(sURL, sTitle) { 
-    try { 
-        window.external.addFavorite(sURL, sTitle) 
-    } catch(e) { 
-        try { 
-            window.sidebar.addPanel(sTitle, sURL, "") 
-        } catch(e) { 
-            alert("加入收藏失败，请使用Ctrl+D进行添加") 
-        } 
-    } 
-} 
-
-//设置为主页
-function setHomepage() { 
-    if (document.all) { 
-        document.body.style.behavior = 'url(#default#homepage)'; 
-        document.body.setHomePage('http://www.jq-school.com') 
-    } else if (window.sidebar) { 
-        if (window.netscape) { 
-            try { 
-                netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect") 
-            } catch(e) { 
-                alert("该操作被浏览器拒绝，如果想启用该功能，请在地址栏内输入 about:config,然后将项 signed.applets.codebase_principal_support 值该为true") 
-            } 
-        } 
-        var prefs = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch); 
-        prefs.setCharPref('browser.startup.homepage', 'http://www.jq-school.com') 
-    } 
-} 
-
-//添加input元素
-function addInputEle(){
-	var mainForm = document.forms[0];
-	var newInput = document.createElement('input');
-	newInput.type = 'hidden';
-	newInput.value = '';
-	newInput.name = '';
-	mainForm.appendChild(newInput);
-}
 
 //添加select元素
 function addSelectEle(divEle){
