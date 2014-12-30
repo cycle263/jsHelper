@@ -199,6 +199,24 @@ function unique(arr){
 	return newArr;
 }
 
+/*随机颜色函数
+ *Method 1
+ *易于理解
+ */
+function getRandomColor(){
+	var strArr = '0123456789ABCDEF'.split(''), resultStr = '#';
+	for(var i = 0; i < 6; i++){
+		resultStr += strArr[Math.floor(Math.random()*16)];	
+	}
+	return resultStr;
+}
+/*随机颜色函数
+ *Method 2
+ *简单实用
+ */
+((255*255*255)*Math.random()|0).toString(16);
+(0xFFFFFF*Math.random()|0).toString(16);
+
 //交换值方法, 不建议批量使用，批量使用交换函数
 var a = 9, b = 8;
 a = [b, b = a][0];
