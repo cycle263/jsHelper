@@ -57,7 +57,7 @@
                 div.pager = self;
                 self.container = div;
             }
-            self._calculate();
+            self._calculate();  //页码计算
 
             //页码的开始index和结束index计算
             var start, end, str = '<div class="cycle-page" style="margin:10px;">';
