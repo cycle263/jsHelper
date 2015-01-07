@@ -36,6 +36,7 @@
 
         /*
          *  内部方法--添加样式到head
+         *  返回样式sheet
          */
         this._sheet = (function(){
             var style = document.createElement('style');
