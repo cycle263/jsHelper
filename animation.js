@@ -756,3 +756,7 @@ function setDeceleratingTimeout(callback, factor, times){	//times - 次数    fa
 setDeceleratingTimeout(function(){
 	console.log('hi');
 }, 5, 100);
+
+
+/**/
+显示器的刷新频率一般为60HZ，或者75HZ，意思是每秒刷新60次或者75次，因此动画每帧的间隔时间最好不要小于（1000/60）毫秒。
