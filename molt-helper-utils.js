@@ -217,6 +217,17 @@ function getRandomColor(){
 '#'+((255*255*255)*Math.random()|0).toString(16);	//缺点：不一定够六位十六进制数字
 '#'+(0xFFFFFF*Math.random()|0).toString(16);	//缺点：不一定够六位十六进制数字
 '#' + (((0xFFFFFF-0x100000)*Math.random()+0x100000)|0).toString(16);
+/*比较完美的方案*/
+function getRandomColor(){
+	var result = '#';
+	for(var i = 0; i < 3; i++){
+		var temp = (0xFF * Math.random() | 0).toString(16);
+		temp = temp.length === 1 ? '0' + temp : temp;
+		result += temp;
+		temp = null;
+	}
+	return result;
+}
 
 //交换值方法, 不建议批量使用，批量使用交换函数
 var a = 9, b = 8;
