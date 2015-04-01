@@ -142,21 +142,20 @@
 		return this;
 	}).method('toggleClass', function(class){
 		this.each(function(el){
-			var arr = el.className.split(' '), has = false, index = -1;
+			var arr = el.className.split(' '), index = -1;
 			for(var i = 0, len = arr.length; i < len; i++){
 				if(arr[i] == class){
-					has = true;
 					index = i;
 				}
 			}
-			if(has){
-				arr.splice(index, 1);
-				el.className = arr.join(' ');
+			if(index != -1){
+				arr.splice(index, 1, class);
 			}else{
-				var n = el.className;
-				el.className = n ? n + ' ' + class : class;
-			} 			
+				arr.splice(i, 1, class);
+			}
+			el.className = arr.join(' ');
 		});
+		return this;
 	});
 	
 	//元素属性操作
@@ -251,20 +250,18 @@ _m$.prototype = {
 		return this;
 	},
 	toggleClass: function(class1){
-		var arr = this.el.className.split(' '), has = false, index = -1;
-		for (var i = 0, len = arr.length; i < len; i++) {
-			if (arr[i] == class1) {
-				has = true;
+		var arr = el.className.split(' '), index = -1;
+		for(var i = 0, len = arr.length; i < len; i++){
+			if(arr[i] == class){
 				index = i;
 			}
 		}
-		if (has) {
-			arr.splice(index, 1);
-			this.el.className = arr.join(' ');
-		} else {
-			var n = this.el.className;
-			this.el.className = n ? n + ' ' + class1 : class1;
+		if(index != -1){
+			arr.splice(index, 1, class);
+		}else{
+			arr.splice(i, 1, class);
 		}
+		el.className = arr.join(' ');
 		return this;
 	},
 	addEvent: function(type, fn) {
