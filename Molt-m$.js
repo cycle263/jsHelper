@@ -142,12 +142,15 @@
 		return this;
 	}).method('toggleClass', function(class){
 		this.each(function(el){
-			var arr = el.className.split(' '), has = false;
+			var arr = el.className.split(' '), has = false, index = -1;
 			for(var i = 0, len = arr.length; i < len; i++){
-				if(arr[i] == class){has = true;}
+				if(arr[i] == class){
+					has = true;
+					index = i;
+				}
 			}
 			if(has){
-				arr.splice(i, 1);
+				arr.splice(index, 1);
 				el.className = arr.join(' ');
 			}else{
 				var n = el.className;
@@ -248,14 +251,15 @@ _m$.prototype = {
 		return this;
 	},
 	toggleClass: function(class1){
-		var arr = this.el.className.split(' '), has = false;
+		var arr = this.el.className.split(' '), has = false, index = -1;
 		for (var i = 0, len = arr.length; i < len; i++) {
 			if (arr[i] == class1) {
 				has = true;
+				index = i;
 			}
 		}
 		if (has) {
-			arr.splice(i, 1);
+			arr.splice(index, 1);
 			this.el.className = arr.join(' ');
 		} else {
 			var n = this.el.className;
