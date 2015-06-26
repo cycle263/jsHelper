@@ -1,0 +1,62 @@
+/***************** 对象操作函数 *****************/
+
+//extend，将P中的可枚举的属性复制到O中，返回源对象
+function extend(o, p){
+	for(var prop in p){
+		o[prop] = o[prop];
+	}
+	return o;
+}
+
+//merge，合并属性，并集，返回源对象
+function merge(o, p){
+	for(var prop in p){
+		if(o.hasOwnProperty[prop]) continue;
+		o[prop] = p[prop];
+	}
+	return o;
+}
+
+//restrict，交集，返回源对象
+function restrict(o, p){
+	for(var prop in o){
+		if(!(prop in p)) delete o[prop];
+	}
+	return o;
+}
+
+//substract，去重，返回源对象
+function substract(o, p){
+	for(var prop in p){
+		delete o[prop];
+	}
+	return o;
+}
+
+//union, 并集，返回新对象
+function union(o, p){
+	return extend(extend({}, o), p);
+}
+
+//intersection, 交集，返回新对象
+function intersection(o, p){
+	return restrict(extend({}, o), p);
+}
+
+//对象转换成数组类型
+function keys(o){
+	if(typeof o !== "object") throw TypeError();
+	var result = [];
+	for(var prop in o){
+		if(o.hasOwnProperty(prop))
+			result.push(prop);
+	}
+	return result;
+}
+
+//对象类型判断
+function classof(o){
+	if(o===null) return "Null";
+	if(o===undefined) return "Undefined";
+	return Object.prototype.toString.call(o).slice(8, -1);
+}
