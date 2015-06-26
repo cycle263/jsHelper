@@ -11,87 +11,6 @@ function unsortedStrUnique(str){
     return result;
 }
 
-/***************** 对象操作函数 *****************/
-
-//extend，将P中的可枚举的属性复制到O中，返回源对象
-function extend(o, p){
-	for(var prop in p){
-		o[prop] = o[prop];
-	}
-	return o;
-}
-
-//merge，合并属性，并集，返回源对象
-function merge(o, p){
-	for(var prop in p){
-		if(o.hasOwnProperty[prop]) continue;
-		o[prop] = p[prop];
-	}
-	return o;
-}
-
-//restrict，交集，返回源对象
-function restrict(o, p){
-	for(var prop in o){
-		if(!(prop in p)) delete o[prop];
-	}
-	return o;
-}
-
-//substract，去重，返回源对象
-function substract(o, p){
-	for(var prop in p){
-		delete o[prop];
-	}
-	return o;
-}
-
-//union, 并集，返回新对象
-function union(o, p){
-	return extend(extend({}, o), p);
-}
-
-//intersection, 交集，返回新对象
-function intersection(o, p){
-	return restrict(extend({}, o), p);
-}
-
-//对象转换成数组类型
-function keys(o){
-	if(typeof o !== "object") throw TypeError();
-	var result = [];
-	for(var prop in o){
-		if(o.hasOwnProperty(prop))
-			result.push(prop);
-	}
-	return result;
-}
-
-//对象类型判断
-function classof(o){
-	if(o===null) return "Null";
-	if(o===undefined) return "Undefined";
-	return Object.prototype.toString.call(o).slice(8, -1);
-}
-
-//小数转换成百分数
-function tranPercent(num, digit){
-	var v = Math.pow(10, parseInt(digit));
-	return Math.floor(num * (100 * v))/v;   //多加一个小括号（100 * v），避免精度丢失
-}
-
-//用0补全位数，并返回字符串
-function prefixInteger(num, length) {
-    try{
-        if (num.toFixed().toString().length > length) {  //数值位数不能少于要求总位数
-            throw 'illegal number!';
-        }
-        return (num / Math.pow(10, length)).toFixed(length).substr(2);
-    }catch(err){
-        console.log(err);
-    }
-}
-
 //获取URL查询字符串query string
 function queryStr(url, name){
 	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -103,10 +22,6 @@ function queryStr(url, name){
 //构建字符串最佳方式
 var arr = ['item 1', 'item 2', 'item 3', ...];  
 var list = '<ul><li>' + arr.join('</li><li>') + '</li></ul>';
-
-
-//生成随机码, 转换成2-36进制，然后截取8位
-Math.random().toString(36).substring(2, 10);
 
 //修改Function原型，运行时间，绑定上下文
 Function.prototype.runtime = function(){
@@ -147,94 +62,6 @@ Function.prototype.uncurrying(){
 	};
 }
 
-//Array forEach函数
-if (!Array.prototype.forEach)
-{
-  Array.prototype.forEach = function(fun /*, thisArg */)
-  {
-    "use strict";
-
-    if (this === void 0 || this === null)
-      throw new TypeError();
-
-    var t = Object(this);
-    var len = t.length >>> 0;
-    if (typeof fun !== "function")
-      throw new TypeError();
-
-    var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
-    for (var i = 0; i < len; i++)
-    {
-      if (i in t)
-        fun.call(thisArg, t[i], i, t);
-    }
-  };
-}
-
-//数组去重 --- 性能较好，能区分hash值
-function unique(arr){
-	var newArr = [],
-	    hash = {};
-	for(var i = 0, l = arr.length; i < l; i++){
-		var item = arr[i],
-		    key = Object.prototype.toString.call(item).slice(8, -1) + JSON.stringify(item);
-	    if(hash[key] !== 1){
-	    	newArr.push(item);
-	    	hash[key] = 1;
-	    }
-	}
-	return newArr;
-}
-
-/*随机颜色函数
- *Method 1
- *易于理解
- */
-function getRandomColor(){
-	var strArr = '0123456789ABCDEF'.split(''), resultStr = '#';
-	for(var i = 0; i < 6; i++){
-		resultStr += strArr[Math.floor(Math.random()*16)];	
-	}
-	return resultStr;
-}
-/*随机颜色函数
- *Method 2
- *简单实用
- */
-'#'+((255*255*255)*Math.random()|0).toString(16);	//缺点：不一定够六位十六进制数字
-'#'+(0xFFFFFF*Math.random()|0).toString(16);	//缺点：不一定够六位十六进制数字
-'#' + (((0xFFFFFF-0x100000)*Math.random()+0x100000)|0).toString(16);
-/*比较完美的方案*/
-function getRandomColor(){
-	var result = '#';
-	for(var i = 0; i < 3; i++){
-		var temp = (0xFF * Math.random() | 0).toString(16);
-		temp = temp.length === 1 ? '0' + temp : temp;
-		result += temp;
-		temp = null;
-	}
-	return result;
-}
-
-//交换值方法, 不建议批量使用，批量使用交换函数
-var a = 9, b = 8;
-a = [b, b = a][0];
-
-//数组交换值函数
-function arrSwap(arr, x, y){
-	if(arguments.length < 3) throw new TypeError('Illegal parameters');
-	arr[x] = arr.splice(y, 1, arr[x])[0];
-	return arr;
-}
-
-//是否是素数函数
-function isPrime(num) {
-    var start = 2;
-    while (start <= Math.sqrt(num)) {
-        if (num % start++ < 1) return false;
-    }
-    return (num > 1);
-}
 
 /************************************************/
 
@@ -321,19 +148,6 @@ Object.size = function(obj) {
     return size;
 };
 
-//判断对象是否存在于数组之中
-function deepArrayCompare(arr, obj){
-        var result = false;
-        var o = JSON.stringify(obj);
-
-        for(var i = 0, l = arr.length; i < l; i++){
-            var o1 = JSON.stringify(arr[i]);
-            if(o == o1){
-                result = true;
-            }
-        }
-        return result;
-    };
 
 /***************** 比对外链样式表名称 *******************/
 function compareStyleName(styleName){
@@ -432,10 +246,6 @@ var convertDOM = {
 convertDOM.init();
 
 /* ######################  Nodelist、HTMLCollection转换成数组  ###################### */
-var convertArray = function(list){
-	return Array.prototype.slice.call(list);
-};
-
 
 /*************** JSON转换CSV及example **************/
     function jsonToCSV(json, isFirst, isLast) {
@@ -457,161 +267,6 @@ var arr = [{name:'cycle',job:'dev',dep:'GSDT',region:'CD'},{name:'cycle',job:'de
 for(var i = 0, l = arr.length;i < l;i++){
     str += jsonToCSV(arr[i], i==0, i==arr.length - 1); 
 }
-
-
-/* ######################  重写Array原生对象prototype方法remove  ###################### */
-Array.prototype.remove = function(from, to){
-	var temps = this.slice(parseInt(to || from) + 1 || this.length);  //截取删除后的后半部分
-	this.length = from > 0 ? this.length + from : from;  //数组只保留删除后的前半部分
-	return this.push.apply(this, temps);  //将后半部分推入数组
-}
-
-Array.prototype.remove = function() {
-    var what, a = arguments, L = a.length, ax;
-    while (L && this.length) {
-        what = a[--L];
-        while ((ax = this.indexOf(what)) !== -1) {
-            this.splice(ax, 1);
-        }
-    }
-    return this;
-};
-
-Array.prototype.remove = function(){
-    var a = arguments, l = a.length, i;
-    if(!l){
-	for(var j = 0; j < l; j ++){
-	    i = this.indexOf(a[j]);
-	    this.splice(i, 1);
-	}
-    }    	
-};
-
-/* ######################  兼容IE5写原生方法push和shift  ###################### */
-function Array_push() {
-	var A_p = 0;
-	for (A_p = 0; A_p < arguments.length; A_p++) {
-		this[this.length] = arguments[A_p];
-	}
-	return this.length;
-}
-
-if (typeof Array.prototype.push == "undefined") {
-	Array.prototype.push = Array_push;
-}
-
-function Array_shift() {
-	var A_s = 0;
-	var response = this[0];
-	for (A_s = 0; A_s < this.length-1; A_s++) {
-		this[A_s] = this[A_s + 1];
-	}
-	this.length--;
-	return response;
-}
-
-if (typeof Array.prototype.shift == "undefined") {
-	Array.prototype.shift = Array_shift;
-}
-
-
-////////////////////////  Cookies  /////////////////////////
-var CookieUtil = {
-	get: function(name){
-		var cookieName = encodeURIComponent(name) + "=",
-			cookieStart = document.cookie.indexOf(cookieName),
-			cookieValue = null;
-		if(cookieValue > -1){
-			var cookieEnd = document.cookie.indexOf(";", cookieStart);
-			if(cookieEnd == -1){
-				cookieEnd = document.cookie.length;				
-			}
-			cookieValue = decodeURIComponent(document.cookie.substring(cookieStart +
-						cookieName.length, cookieEnd));
-		}
-		return cookieValue;
-	},
-	set: function(name, value, expires, path, domain, secure){
-		var cookieText = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-		
-		(expires instanceof Date) && (cookieText += "; expires=" + expires.toGMTString());
-		path && (cookieText += "; path=" + path);
-		domain && (cookieText += "; domain=" + domain);
-		secure && (cookieText += "; secure");
-
-		document.cookie = cookieText;
-	}
-	unset: function(name, path, domain, secure){
-		this.set(name, "", new Date(0), path, domain, secure);
-	}
-};
-
-//MS 版本
-var docCookies = {
-    getItem: function(sKey) {
-        return unescape(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + escape(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-    },
-    setItem: function(sKey, sValue, vEnd, sPath, sDomain, bSecure) {
-        if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
-        var sExpires = "";
-        if (vEnd) {
-            switch (vEnd.constructor) {
-                case Number:
-                    sExpires = vEnd === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + vEnd;
-                    break;
-                case String:
-                    sExpires = "; expires=" + vEnd;
-                    break;
-                case Date:  //兼容性较好，IE下面兼容
-                    sExpires = "; expires=" + vEnd.toUTCString();
-                    break;
-            }
-        }
-        document.cookie = escape(sKey) + "=" + escape(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
-        return true;
-    },
-    removeItem: function(sKey, sPath) {
-        if (!sKey || !this.hasItem(sKey)) { return false; }
-        document.cookie = escape(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (sPath ? "; path=" + sPath : "");
-        return true;
-    },
-    hasItem: function(sKey) {
-        return (new RegExp("(?:^|;\\s*)" + escape(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
-    },
-    keys: /* optional method: you can safely remove it! */function() {
-        var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
-        for (var nIdx = 0; nIdx < aKeys.length; nIdx++) { aKeys[nIdx] = unescape(aKeys[nIdx]); }
-        return aKeys;
-    }
-};
-
-
-//PPK版本
-var Cookies = {
-	init: function () {
-		var allCookies = document.cookie.split('; ');
-		for (var i = 0, len = allCookies.length; i < len; i++) {
-			var cookiePair = allCookies[i].split('=');
-			this[cookiePair[0]] = cookiePair[1];
-		}
-	},
-	create: function (name,value,days) {
-		if (days) {
-			var date = new Date();
-			date.setTime(date.getTime() + (days*24*60*60*1000));
-			var expires = "; expires=" + date.toGMTString();
-		}
-		else var expires = "";
-		document.cookie = name + "=" + value + expires + "; path=/";
-		this[name] = value;
-	},
-	erase: function (name) {
-		this.create(name,'',-1);
-		this[name] = undefined;
-	}
-};
-Cookies.init();
-
 
 /*###################### 创建目录及隐藏 ######################*/
 function createTOC() {
@@ -990,41 +645,6 @@ function augment(receivingClass, givingClass){
 	}
 }
 
-///////////////  正则表达式案例  ///////////////
-验证数字：^[0-9]*$
-验证n位的数字：^\d{n}$
-验证至少n位数字：^\d{n,}$
-验证m-n位的数字：^\d{m,n}$
-验证数字和小数点:^[0-9]+([.]{0}|[.]{1}[0-9]+)$
-验证零和非零开头的数字：^(0|[1-9][0-9]*)$
-验证有两位小数的正实数：^[0-9]+(.[0-9]{2})?$
-验证有1-3位小数的正实数：^[0-9]+(.[0-9]{1,3})?$
-验证非零的正整数：^\+?[1-9][0-9]*$
-验证非零的负整数：^\-[1-9][0-9]*$
-验证非负整数（正整数 + 0）  ^\d+$
-验证非正整数（负整数 + 0）  ^((-\d+)|(0+))$
-验证长度为3的字符：^.{3}$
-验证由26个英文字母组成的字符串：^[A-Za-z]+$
-验证由26个大写英文字母组成的字符串：^[A-Z]+$
-验证由26个小写英文字母组成的字符串：^[a-z]+$
-验证由数字和26个英文字母组成的字符串：^[A-Za-z0-9]+$
-验证由数字、26个英文字母或者下划线组成的字符串：^\w+$
-验证用户密码:^[a-zA-Z]\w{5,17}$ 正确格式为：以字母开头，长度在6-18之间，只能包含字符、数字和下划线。
-验证是否含有 ^%&',;=?$\" 等字符：[^%&',;=?$\x22]+
-验证汉字：^[\u4e00-\u9fa5],{0,}$
-验证Email地址：^\w+[-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$
-验证InternetURL：^http://([\w-]+\.)+[\w-]+(/[\w-./?%&=]*)?$ ；^[a-zA-z]+://(w+(-w+)*)(.(w+(-w+)*))*(?S*)?$
-验证电话号码：^(\(\d{3,4}\)|\d{3,4}-)?\d{7,8}$：--正确格式为：XXXX-XXXXXXX，XXXX-XXXXXXXX，XXX-XXXXXXX，XXX-XXXXXXXX，XXXXXXX，XXXXXXXX。
-验证电话号码及手机:（\d{3}-\d{8}|\d{4}-\d{7}）｜（^((\(\d{3}\))|(\d{3}\-))?13\d{9}|15[89]\d{8}$） 
-验证身份证号（15位或18位数字）：^\d{15}|\d{}18$
-验证一年的12个月：^(0?[1-9]|1[0-2])$ 正确格式为：“01”-“09”和“1”“12”
-验证一个月的31天：^((0?[1-9])|((1|2)[0-9])|30|31)$    正确格式为：01、09和1、31。
-整数：^-?\d+$
-非负浮点数（正浮点数 + 0）：^\d+(\.\d+)?$
-正浮点数   ^(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*))$
-非正浮点数（负浮点数 + 0） ^((-\d+(\.\d+)?)|(0+(\.0+)?))$
-负浮点数  ^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$
-浮点数  ^(-?\d+)(\.\d+)?$
 
 ///////////////////////  就地编辑域  //////////////////////////
 function EditInPlaceField(id, parent, value){
