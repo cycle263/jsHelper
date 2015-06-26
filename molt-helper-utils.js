@@ -1,17 +1,4 @@
 /* javascript 数据类型 操作 */
-//string unique —— regexp
-function strUnique(str){    //example: '111222333334555777888' -- 有序
-	var arr = str.match(/(\w)\1*/g), len = 0, char = '';
-	for(var i = 0, l = arr.length; i < l; i++){
-		var leng = arr[i].length;
-		if(len < leng) {
-			len = leng;
-			char = arr[i][0];
-		}
-	}
-	return {length: len, char: char};
-}
-
 //无序的字符串去重
 function unsortedStrUnique(str){
     var l = str.length,
