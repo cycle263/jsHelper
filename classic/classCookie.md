@@ -1,3 +1,4 @@
+```
 ////////////////////////  Cookies  /////////////////////////
 var CookieUtil = {
 	get: function(name){
@@ -94,3 +95,4 @@ var Cookies = {
 	}
 };
 Cookies.init();
+```
