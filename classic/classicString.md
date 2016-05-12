@@ -1,3 +1,4 @@
+```
 //string unique —— regexp
 //返回连续重复最多的字符及其个数
 function strUnique(str){    //example: '111222333334555777888' -- 有序
@@ -13,3 +14,4 @@ function strUnique(str){    //example: '111222333334555777888' -- 有序
 	return {length: len, char: char};
 }
 备注：/(\w)\1*/g ，其中\1表示上一个匹配值。
+```
