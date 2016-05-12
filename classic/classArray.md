@@ -1,3 +1,4 @@
+```
 /* ######################  重写Array原生对象prototype方法remove  ###################### */
 Array.prototype.remove = function(from, to){
 	var temps = this.slice(parseInt(to || from) + 1 || this.length);  //截取删除后的后半部分
@@ -124,3 +125,4 @@ function deepArrayCompare(arr, obj){
         }
         return result;
     };
+```
