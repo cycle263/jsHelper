@@ -1,3 +1,4 @@
+```
 //生成随机码, 转换成2-36进制，然后截取8位
 Math.random().toString(36).substring(2, 10);
 
@@ -58,3 +59,4 @@ function getRandomColor(){
 	}
 	return result;
 }
+```
