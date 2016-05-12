@@ -1,3 +1,4 @@
+```
 /***************** 对象操作函数 *****************/
 
 //extend，将P中的可枚举的属性复制到O中，返回源对象
@@ -184,3 +185,4 @@ function augment(receivingClass, givingClass){
 		}
 	}
 }
+```
